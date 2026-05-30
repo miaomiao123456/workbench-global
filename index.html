@@ -1804,7 +1804,10 @@ body {
 .tl-time { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
 .tl-source { font-size: 11px; font-weight: 500; }
 .tl-keyword { background: rgba(45,127,249,0.12); color: var(--accent-blue); padding: 1px 6px; border-radius: 2px; font-size: 10px; }
-.tl-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+.tl-title { font-size: 13px; font-weight: 600; color: var(--accent-blue); text-decoration: none; display: block; margin-bottom: 5px; line-height: 1.45; cursor: pointer; }
+.tl-title:hover { text-decoration: underline; }
+.tl-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.tl-img { max-width: 300px; width: 100%; height: auto; border-radius: 8px; margin-top: 8px; display: block; object-fit: cover; border: 1px solid var(--border); }
 .tl-link { font-size: 10px; color: var(--accent-blue); cursor: pointer; margin-top: 4px; display: inline-block; text-decoration:none; }
 .tl-link:hover { text-decoration: underline; }
 .tl-researcher { font-size: 10px; color: var(--accent-cyan); background: rgba(0,184,148,0.08); padding: 1px 6px; border-radius: 2px; }
@@ -5741,35 +5744,39 @@ document.querySelectorAll('.monitor-tab').forEach(tab => {
 
 // ========== TIMELINE DATA ==========
 const timelineData = [
-  { time: '14:58', source: '财联社', kw: '英伟达', researcher: '陈明远', industry: 'tech', title: '英伟达中国区负责人抵京，H20芯片合规出口推进', url: 'https://www.cls.cn/detail/1234567', text: '【独家】英伟达中国区负责人已抵京，明日将与工信部官员会面讨论H20芯片合规出口细节。据产业链人士透露，首批H20芯片已通过海关审批。' },
-  { time: '14:42', source: '证券时报', kw: '宁德时代', researcher: '刘思远', industry: 'manufacture', title: '中信上调宁德时代目标价至280元', url: 'https://www.cs.com.cn/report/202605', text: '中信证券发布深度报告，上调宁德时代目标价至280元，核心逻辑：① 欧盟关税下调预期 ② 储能业务收入占比提升至25% ③ 固态电池中试线进展超预期。' },
+  { time: '14:58', source: '财联社', kw: '英伟达', researcher: '陈明远', industry: 'tech', title: '英伟达中国区负责人抵京，H20芯片合规出口推进', url: 'https://www.cls.cn/detail/1234567', text: '【独家】英伟达中国区负责人已抵京，明日将与工信部官员会面讨论H20芯片合规出口细节。据产业链人士透露，首批H20芯片已通过海关审批。', img: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&h=220&fit=crop' },
+  { time: '14:42', source: '证券时报', kw: '宁德时代', researcher: '刘思远', industry: 'manufacture', title: '中信上调宁德时代目标价至280元', url: 'https://www.cs.com.cn/report/202605', text: '中信证券发布深度报告，上调宁德时代目标价至280元，核心逻辑：① 欧盟关税下调预期 ② 储能业务收入占比提升至25% ③ 固态电池中试线进展超预期。', img: 'https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?w=400&h=220&fit=crop' },
   { time: '14:15', source: '上交所', kw: '万科A', researcher: '', industry: 'finance', title: '万科A拟配股融资150亿偿还有息负债', url: 'https://www.sse.com.cn/disclosure/bond/announcement/c/9876543.shtml', text: '万科A(000002)：拟向不超过35名特定投资者配股，募集资金总额不超过人民币150亿元，全部用于偿还公司有息负债。' },
-  { time: '13:50', source: '机器之心', kw: '光伏', researcher: '刘思远', industry: 'manufacture', title: '隆基绿能下调组件报价5-8%，价格战风险加剧', url: 'https://www.jiqizhixin.com/articles/20260520-pv', text: '隆基绿能内部人士确认将下调组件报价5-8%，目标是夺回东南亚市场份额。此举可能引发新一轮价格战。通威股份、晶科能源盘中一度跳水。' },
+  { time: '13:50', source: '机器之心', kw: '光伏', researcher: '刘思远', industry: 'manufacture', title: '隆基绿能下调组件报价5-8%，价格战风险加剧', url: 'https://www.jiqizhixin.com/articles/20260520-pv', text: '隆基绿能内部人士确认将下调组件报价5-8%，目标是夺回东南亚市场份额。此举可能引发新一轮价格战。通威股份、晶科能源盘中一度跳水。', img: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400&h=220&fit=crop' },
   { time: '13:22', source: '每日经济', kw: '消费', researcher: '', industry: 'consume', title: '五一黄金周社零同比+6.8%超预期', url: 'https://www.mofcom.gov.cn/article/ae/sjjd/202605/20260503456789.shtml', text: '商务部公布五一黄金周消费数据：社零同比+6.8%（前值+4.2%），其中免税渠道增速最快+22%，餐饮+12.3%，汽车+8.7%。' },
-  { time: '12:45', source: '量子位', kw: '半导体', researcher: '周磊', industry: 'tech', title: '中芯国际天津28nm产线扩产至月产5万片', url: 'https://www.qbitai.com/2026/05/semiconductor-smic.html', text: '中芯国际天津工厂传出扩产消息，成熟制程28nm产线月产能将从3万片提升至5万片，预计Q4达产。' },
-  { time: '11:30', source: '华泰证券', kw: '中科曙光', researcher: '陈明远', industry: 'ai', title: '中科曙光Q2 AI服务器订单环比增长60%', url: 'https://www.htsc.com.cn/research/detail/202605201130', text: '华泰证券电子团队调研纪要：中科曙光Q2 AI服务器订单环比增长60%，主要来自互联网大厂和政府智算中心项目。' },
+  { time: '12:45', source: '量子位', kw: '半导体', researcher: '周磊', industry: 'tech', title: '中芯国际天津28nm产线扩产至月产5万片', url: 'https://www.qbitai.com/2026/05/semiconductor-smic.html', text: '中芯国际天津工厂传出扩产消息，成熟制程28nm产线月产能将从3万片提升至5万片，预计Q4达产。', img: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=220&fit=crop' },
+  { time: '11:30', source: '华泰证券', kw: '中科曙光', researcher: '陈明远', industry: 'ai', title: '中科曙光Q2 AI服务器订单环比增长60%', url: 'https://www.htsc.com.cn/research/detail/202605201130', text: '华泰证券电子团队调研纪要：中科曙光Q2 AI服务器订单环比增长60%，主要来自互联网大厂和政府智算中心项目。', img: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=220&fit=crop' },
   { time: '10:15', source: 'Wind', kw: '地产', researcher: '', industry: 'finance', title: '住建部研究新一轮房地产支持政策', url: 'https://www.wind.com.cn/news/202605/property-policy.html', text: '住建部：将研究出台新一轮房地产支持政策，重点关注一线城市限购松绑和房贷利率下调空间。' },
   { time: '09:42', source: '路透社', kw: '中美', researcher: '张峰', industry: 'ai', title: '中美就AI安全和半导体供应链达成初步共识', url: 'https://www.reuters.com/technology/us-china-tech-cooperation-2026-05-20', text: '据路透社援引知情人士，中美双方已就部分科技领域合作达成初步共识，涉及AI安全和半导体供应链。正式声明预计本周五发布。' },
   { time: '09:15', source: '财联社', kw: '新能源', researcher: '刘思远', industry: 'manufacture', title: '欧盟拟将中国电动车关税下调至17-20%', url: 'https://www.cls.cn/detail/1234590', text: '欧盟内部文件显示，拟将中国电动车关税从当前的37.6%下调至17-20%区间，具体税率将在6月初公布。宁德时代、比亚迪盘前竞价涨幅均超2%。' },
 ];
 
-const timelineFeedEl = document.getElementById('timeline-feed');
-timelineData.forEach((t, i) => {
-  timelineFeedEl.innerHTML += `
+function timelineItemHTML(t, i, total) {
+  return `
     <div class="timeline-item">
       <div class="timeline-dot-col">
         <div class="timeline-dot" style="${i === 0 ? 'background:var(--accent-cyan);box-shadow:0 0 8px rgba(0,212,170,0.4)' : ''}"></div>
-        ${i < timelineData.length - 1 ? '<div class="timeline-line"></div>' : ''}
+        ${i < total - 1 ? '<div class="timeline-line"></div>' : ''}
       </div>
       <div class="timeline-content">
         <div class="tl-header">
           <span class="tl-time">${t.time}</span>
           <span class="tl-source">${t.source}</span>
         </div>
-        <div class="tl-text">${t.text}</div>
-        <a class="tl-link" href="${t.url}" target="_blank">${t.title} →</a>
+        <a class="tl-title" href="${t.url}" target="_blank">${t.title}</a>
+        <div class="tl-text">${t.text || ''}</div>
+        ${t.img ? `<img class="tl-img" src="${t.img}" loading="lazy" referrerpolicy="no-referrer">` : ''}
       </div>
     </div>`;
+}
+const timelineFeedEl = document.getElementById('timeline-feed');
+timelineData.forEach((t, i) => {
+  timelineFeedEl.innerHTML += timelineItemHTML(t, i, timelineData.length);
 });
 const myMonitorGroups = [
   { name: '半导体产业链', sources: '财联社电报、华泰研报、上交所公告', industry: 'tech' },
@@ -5787,21 +5794,7 @@ function renderMyMonitorFeed(idx) {
     feedEl.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-muted); font-size:12px;">该监控器今日暂无命中</div>';
     return;
   }
-  feedEl.innerHTML = items.map((t, i) => `
-    <div class="timeline-item">
-      <div class="timeline-dot-col">
-        <div class="timeline-dot" style="${i === 0 ? 'background:var(--accent-cyan);box-shadow:0 0 8px rgba(0,212,170,0.4)' : ''}"></div>
-        ${i < items.length - 1 ? '<div class="timeline-line"></div>' : ''}
-      </div>
-      <div class="timeline-content">
-        <div class="tl-header">
-          <span class="tl-time">${t.time}</span>
-          <span class="tl-source">${t.source}</span>
-        </div>
-        <div class="tl-text">${t.text}</div>
-        <a class="tl-link" href="${t.url}" target="_blank">${t.title} →</a>
-      </div>
-    </div>`).join('');
+  feedEl.innerHTML = items.map((t, i) => timelineItemHTML(t, i, items.length)).join('');
 }
 function filterMyMonitor(idx, el) {
   const chips = document.getElementById('my-monitor-chips');
@@ -5882,21 +5875,7 @@ function filterMonitorByIndustry(industry) {
   el.innerHTML = '';
   const filtered = industry === 'all' ? timelineData : timelineData.filter(t => t.industry === industry);
   filtered.forEach((t, i) => {
-    el.innerHTML += `
-      <div class="timeline-item">
-        <div class="timeline-dot-col">
-          <div class="timeline-dot" style="${i === 0 ? 'background:var(--accent-cyan);box-shadow:0 0 8px rgba(0,212,170,0.4)' : ''}"></div>
-          ${i < filtered.length - 1 ? '<div class="timeline-line"></div>' : ''}
-        </div>
-        <div class="timeline-content">
-          <div class="tl-header">
-            <span class="tl-time">${t.time}</span>
-            <span class="tl-source">${t.source}</span>
-          </div>
-          <div class="tl-text">${t.text}</div>
-          <a class="tl-link" href="${t.url}" target="_blank">${t.title} →</a>
-        </div>
-      </div>`;
+    el.innerHTML += timelineItemHTML(t, i, filtered.length);
   });
   updateAiDaily(industry);
 }
