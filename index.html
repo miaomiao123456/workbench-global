@@ -8595,31 +8595,68 @@ function openReportDetail(id) {
 function openResearchDetail(id) {
   const item = researchData.find(r => r.id === id);
   if (!item) return;
-  const toc = ['调研概述', '核心发现', '详细内容', '相关标的'];
-  const content = `
-    <h1>${item.title}</h1>
-    <div class="meta">
-      <span>${item.date}</span>
-      <span class="tag" style="background:${item.color}15;color:${item.color};">${item.typeLabel}</span>
-      ${item.stocks.length ? item.stocks.map(s => '<span class="tag">' + s + '</span>').join('') : ''}
+  const isEnded = new Date(item.date) < new Date('2026-05-20');
+  const statusText = isEnded ? '已结束' : '待开始';
+  const statusColor = isEnded ? '#9aa3b4' : '#00b894';
+
+  const infoRows = [
+    ['活动主题', `<span style="font-weight:700;">${item.title}</span> <span style="color:${statusColor};font-size:12px;font-weight:600;margin-left:8px;">${statusText}</span>`],
+    ['报名方式', item.registration || '审核报名'],
+    ['活动开始', item.date + ' 14:00'],
+    ['活动结束', item.endDate || item.date + ' 23:59'],
+    ['调研对象', item.target || '--'],
+    ['出席人', item.attendees || '--'],
+    ['活动地址', item.location || '--'],
+  ];
+
+  const infoTable = infoRows.map(([label, value]) => `
+    <div style="display:flex;padding:16px 0;border-bottom:1px solid var(--border);">
+      <div style="width:100px;flex-shrink:0;font-size:13px;color:var(--blue);font-weight:500;">${label}</div>
+      <div style="flex:1;font-size:13px;line-height:1.6;">${value}</div>
     </div>
-    <h2 id="sec0">调研概述</h2>
-    <p>${item.summary}</p>
-    <h2 id="sec1">核心发现</h2>
-    <div class="highlight"><p>以下为调研核心发现，供投资决策参考。</p></div>
-    <ul>
-      <li>产业趋势验证：实地调研确认行业景气度与案头研究结论一致，核心环节供需偏紧</li>
-      <li>竞争格局：龙头厂商技术壁垒持续加深，二线厂商差异化突围路径逐步明确</li>
-      <li>商业化进展：头部客户订单落地节奏符合预期，收入确认有望加速</li>
-    </ul>
-    <h2 id="sec2">详细内容</h2>
-    <p>本次${item.typeLabel}围绕行业核心环节展开，通过实地走访和深度交流，验证了产业链关键假设。</p>
-    <p>在技术维度，最新研发进展表明核心技术指标达到预期水平，量产条件已基本具备。在需求侧，下游客户反馈积极，采购意愿和预算规模均有明显提升。</p>
-    <p>风险层面需关注上游原材料价格波动、行业产能扩张节奏以及海外政策不确定性。整体判断：当前处于产业加速期，建议沿核心环节积极配置。</p>
-    <h2 id="sec3">相关标的</h2>
-    <ul>
-      ${item.stocks.length ? item.stocks.map(s => '<li><strong>' + s + '</strong> — 核心受益标的，建议关注</li>').join('') : '<li>暂无明确关联个股</li>'}
-    </ul>
+  `).join('');
+
+  const detailBlock = `
+    <div style="padding:16px 0;border-bottom:1px solid var(--border);">
+      <div style="width:100px;font-size:13px;color:var(--blue);font-weight:500;margin-bottom:12px;">活动详情</div>
+      <div style="background:var(--bg);border-radius:8px;padding:16px;font-size:13px;line-height:1.8;color:var(--text-sec);">
+        <p style="margin-bottom:6px;"><strong>${item.title}</strong></p>
+        <p style="margin-bottom:6px;">出席人：${item.attendees || '--'}</p>
+        <p style="margin-bottom:6px;">时间：${item.date} 14:00</p>
+        <p>${item.summary}</p>
+      </div>
+    </div>
+  `;
+
+  let bottomSection = '';
+  if (isEnded) {
+    bottomSection = `
+      <h2 id="sec1" style="margin-top:28px;">纪要内容</h2>
+      <div class="highlight"><p>以下为活动纪要，由AI基于现场记录自动生成。</p></div>
+      <ul>
+        <li>产业趋势验证：实地调研确认行业景气度与案头研究结论一致，核心环节供需偏紧</li>
+        <li>竞争格局：龙头厂商技术壁垒持续加深，二线厂商差异化突围路径逐步明确</li>
+        <li>商业化进展：头部客户订单落地节奏符合预期，收入确认有望加速</li>
+        <li>风险关注：上游原材料价格波动、行业产能扩张节奏及海外政策不确定性</li>
+      </ul>
+      <h2 id="sec2">相关标的</h2>
+      <ul>
+        ${item.stocks.length ? item.stocks.map(s => '<li><strong>' + s + '</strong> — 核心受益标的，建议关注</li>').join('') : '<li>暂无明确关联个股</li>'}
+      </ul>
+    `;
+  } else {
+    bottomSection = `
+      <div id="sec1" style="margin-top:28px;display:flex;gap:12px;">
+        <button style="padding:10px 32px;background:#e8740a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;" onclick="alert('已提交报名申请')">立即报名</button>
+        <button style="padding:10px 24px;background:var(--bg);color:var(--text-sec);border:1px solid var(--border);border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;" onclick="alert('分享链接已复制')">分享</button>
+      </div>
+    `;
+  }
+
+  const toc = isEnded ? ['活动信息', '纪要内容', '相关标的'] : ['活动信息', '报名'];
+  const content = `
+    <div id="sec0">${infoTable}${detailBlock}</div>
+    ${bottomSection}
   `;
   openDetailPage({ title: item.title, toc, content });
 }
@@ -9399,16 +9436,16 @@ function changeCalendarMonth(delta) {
 
 // ========== RESEARCH PAGE DATA & LOGIC ==========
 const researchData = [
-  { id:1, date:'2026-05-18', type:'field', title:'走进阶跃星辰 — AI调研第一期', industry:'ai', stocks:['千里科技'], summary:'实地走访阶跃星辰北京总部，深度了解Step-3训练基础设施与端侧部署进展。万亿参数模型蒸馏技术突破，千里科技首发搭载方案已进入联调阶段。', typeLabel:'实地调研', color:'#2d7ff9' },
-  { id:2, date:'2026-05-15', type:'expert-call', title:'海光信息DCU四代进展电话会', industry:'semiconductor', stocks:['海光信息'], summary:'FP16算力较三代提升2.5倍，生态适配覆盖PyTorch/PaddlePaddle。预计Q3开始小批量供货，主要面向运营商和国企客户。', typeLabel:'专家电话会', color:'#00b894' },
-  { id:3, date:'2026-05-12', type:'chain', title:'光模块800G供应链验证', industry:'semiconductor', stocks:['中际旭创','新易盛'], summary:'走访东莞光模块代工厂，确认800G产能Q2开始爬坡。DSP芯片仍依赖Marvell，国产替代进展有限。', typeLabel:'产业链验证', color:'#e09f13' },
-  { id:4, date:'2026-05-10', type:'field', title:'千里科技深圳研发中心走访', industry:'ai', stocks:['千里科技'], summary:'自研NPU芯片端云协同能力验证通过，车企定点3年需求锁定。AI终端新品将于Q3面市。', typeLabel:'实地调研', color:'#2d7ff9' },
-  { id:5, date:'2026-05-08', type:'grassroot', title:'深圳华强北AI硬件渠道调研', industry:'ai', stocks:[], summary:'AI硬件终端需求明显升温，AI眼镜/AI录音笔/AI翻译机销量环比增长200%+。消费者认知度快速提升。', typeLabel:'草根调研', color:'#8b5cf6' },
-  { id:6, date:'2026-05-06', type:'expert-call', title:'宁德时代储能业务展望', industry:'newenergy', stocks:['宁德时代'], summary:'储能系统成本降至0.8元/Wh，海外储能订单增速超预期。美国IRA补贴带动北美产能布局加速。', typeLabel:'专家电话会', color:'#00b894' },
-  { id:7, date:'2026-05-04', type:'chain', title:'服务器液冷产业链调研', industry:'ai', stocks:['中科曙光'], summary:'液冷渗透率从2025年15%提升至2026年30%，冷板式方案成为主流。曙光液冷解决方案市占率第一。', typeLabel:'产业链验证', color:'#e09f13' },
-  { id:8, date:'2026-05-02', type:'field', title:'比亚迪常州工厂智能化升级', industry:'newenergy', stocks:['比亚迪'], summary:'产线AI质检覆盖率提升至95%，机器人密度达到300台/万人，自动化水平行业领先。', typeLabel:'实地调研', color:'#2d7ff9' },
-  { id:9, date:'2026-04-28', type:'grassroot', title:'上海AI创业公司生态调研', industry:'ai', stocks:[], summary:'走访张江/漕河泾20+AI初创公司，多数聚焦垂直行业Agent应用，融资环境较2024年明显回暖。', typeLabel:'草根调研', color:'#8b5cf6' },
-  { id:10, date:'2026-04-25', type:'expert-call', title:'北方华创新品发布前瞻', industry:'semiconductor', stocks:['北方华创'], summary:'12英寸刻蚀设备新品即将发布，制程覆盖至14nm以下，国内晶圆厂验证进展顺利。', typeLabel:'专家电话会', color:'#00b894' },
+  { id:1, date:'2026-05-18', endDate:'2026-05-18 17:00', type:'field', title:'走进阶跃星辰 — AI调研第一期', industry:'ai', stocks:['千里科技'], summary:'实地走访阶跃星辰北京总部，深度了解Step-3训练基础设施与端侧部署进展。万亿参数模型蒸馏技术突破，千里科技首发搭载方案已进入联调阶段。', typeLabel:'实地调研', color:'#2d7ff9', registration:'审核报名', target:'阶跃星辰', attendees:'阶跃星辰技术团队', location:'北京市海淀区中关村智造大街G座12层' },
+  { id:2, date:'2026-05-15', endDate:'2026-05-15 16:00', type:'expert-call', title:'海光信息DCU四代进展电话会', industry:'semiconductor', stocks:['海光信息'], summary:'FP16算力较三代提升2.5倍，生态适配覆盖PyTorch/PaddlePaddle。预计Q3开始小批量供货，主要面向运营商和国企客户。', typeLabel:'专家电话会', color:'#00b894', registration:'免费参与', target:'海光信息', attendees:'海光信息CTO、中金公司TMT首席', location:'线上·腾讯会议' },
+  { id:3, date:'2026-05-12', endDate:'2026-05-12 17:30', type:'chain', title:'光模块800G供应链验证', industry:'semiconductor', stocks:['中际旭创','新易盛'], summary:'走访东莞光模块代工厂，确认800G产能Q2开始爬坡。DSP芯片仍依赖Marvell，国产替代进展有限。', typeLabel:'产业链验证', color:'#e09f13', registration:'邀请制', target:'东莞光模块代工厂', attendees:'中际旭创供应链负责人', location:'广东省东莞市长安镇科技园A栋' },
+  { id:4, date:'2026-05-10', endDate:'2026-05-10 17:00', type:'field', title:'千里科技深圳研发中心走访', industry:'ai', stocks:['千里科技'], summary:'自研NPU芯片端云协同能力验证通过，车企定点3年需求锁定。AI终端新品将于Q3面市。', typeLabel:'实地调研', color:'#2d7ff9', registration:'审核报名', target:'千里科技', attendees:'千里科技研发VP', location:'深圳市南山区粤海街道科技园南区T3栋' },
+  { id:5, date:'2026-05-08', endDate:'2026-05-08 18:00', type:'grassroot', title:'深圳华强北AI硬件渠道调研', industry:'ai', stocks:[], summary:'AI硬件终端需求明显升温，AI眼镜/AI录音笔/AI翻译机销量环比增长200%+。消费者认知度快速提升。', typeLabel:'草根调研', color:'#8b5cf6', registration:'自由参加', target:'华强北电子市场', attendees:'渠道经销商', location:'深圳市福田区华强北路' },
+  { id:6, date:'2026-05-06', endDate:'2026-05-06 16:30', type:'expert-call', title:'宁德时代储能业务展望', industry:'newenergy', stocks:['宁德时代'], summary:'储能系统成本降至0.8元/Wh，海外储能订单增速超预期。美国IRA补贴带动北美产能布局加速。', typeLabel:'专家电话会', color:'#00b894', registration:'免费参与', target:'宁德时代', attendees:'宁德时代储能事业部总经理', location:'线上·Zoom' },
+  { id:7, date:'2026-05-04', endDate:'2026-05-04 17:00', type:'chain', title:'服务器液冷产业链调研', industry:'ai', stocks:['中科曙光'], summary:'液冷渗透率从2025年15%提升至2026年30%，冷板式方案成为主流。曙光液冷解决方案市占率第一。', typeLabel:'产业链验证', color:'#e09f13', registration:'邀请制', target:'液冷设备供应商', attendees:'中科曙光液冷方案部', location:'北京市海淀区东北旺西路曙光大厦' },
+  { id:8, date:'2026-05-02', endDate:'2026-05-02 17:00', type:'field', title:'比亚迪常州工厂智能化升级', industry:'newenergy', stocks:['比亚迪'], summary:'产线AI质检覆盖率提升至95%，机器人密度达到300台/万人，自动化水平行业领先。', typeLabel:'实地调研', color:'#2d7ff9', registration:'审核报名', target:'比亚迪常州工厂', attendees:'比亚迪制造中心负责人', location:'江苏省常州市新北区太湖西路88号' },
+  { id:9, date:'2026-04-28', endDate:'2026-04-28 18:00', type:'grassroot', title:'上海AI创业公司生态调研', industry:'ai', stocks:[], summary:'走访张江/漕河泾20+AI初创公司，多数聚焦垂直行业Agent应用，融资环境较2024年明显回暖。', typeLabel:'草根调研', color:'#8b5cf6', registration:'自由参加', target:'张江/漕河泾AI创业公司', attendees:'多家AI初创团队', location:'上海市浦东新区张江高科技园区' },
+  { id:10, date:'2026-04-25', endDate:'2026-04-25 16:00', type:'expert-call', title:'北方华创新品发布前瞻', industry:'semiconductor', stocks:['北方华创'], summary:'12英寸刻蚀设备新品即将发布，制程覆盖至14nm以下，国内晶圆厂验证进展顺利。', typeLabel:'专家电话会', color:'#00b894', registration:'免费参与', target:'北方华创', attendees:'北方华创产品总监', location:'线上·腾讯会议' },
 ];
 
 function renderResearch(data) {
@@ -9582,6 +9619,14 @@ const searchResultsData = [
   { type:'report', title:'AI Agent应用落地节奏跟踪', subtitle:'海通证券 · 增持', page:'reports', summary:'Agent在金融/法律/客服三大场景率先落地，2026年市场规模预计达120亿', source:'海通证券', date:'2026-05-17' },
   { type:'stock', title:'海光信息', subtitle:'688041.SH · 国产GPU · +2.86%', page:'stock', summary:'国产GPU三强之一，DCU四代流片顺利，客户验证进展超预期', source:'中金公司', date:'2026-05-20' },
   { type:'stock', title:'中际旭创', subtitle:'300308.SZ · 光模块 · -1.41%', page:'stock', summary:'全球光模块龙头，800G产品量产交付，受益于北美AI算力扩建', source:'天风证券', date:'2026-05-20' },
+  { type:'announcement', title:'千里科技：关于签署战略合作框架协议的公告', subtitle:'上交所 · 重大事项 · 05-17', page:'', summary:'公司与阶跃星辰签署战略合作协议，双方将在端侧大模型部署、NPU芯片适配等领域展开深度合作。', source:'上交所', date:'2026-05-17' },
+  { type:'announcement', title:'千里科技：2026年第一季度报告', subtitle:'上交所 · 定期报告 · 05-15', page:'', summary:'Q1实现营业收入18.6亿元，同比增长128%；归母净利润2.3亿元，同比增长215%。', source:'上交所', date:'2026-05-15' },
+  { type:'announcement', title:'中科曙光：关于中标国家智算中心项目的公告', subtitle:'上交所 · 重大事项 · 05-18', page:'', summary:'公司中标某国家级智算中心建设项目，合同金额约12.5亿元。', source:'上交所', date:'2026-05-18' },
+  { type:'announcement', title:'宁德时代：关于调整2026年产能规划的公告', subtitle:'深交所 · 重大事项 · 05-13', page:'', summary:'公司将2026年电池产能目标上调至450GWh，较原计划提升15%。', source:'深交所', date:'2026-05-13' },
+  { type:'news', title:'千里科技AI终端新品提前曝光，搭载自研NPU性能超预期', subtitle:'36氪 · 05-20', page:'', summary:'据供应链消息，千里科技即将发布的AI终端新品搭载第二代自研NPU，AI推理性能较上代提升3倍。', source:'36氪', date:'2026-05-20' },
+  { type:'news', title:'中科曙光液冷服务器获国家级数据中心大单', subtitle:'证券时报 · 05-17', page:'', summary:'中科曙光旗下液冷服务器产品线获得某国家级数据中心采购订单，金额超10亿元。', source:'证券时报', date:'2026-05-17' },
+  { type:'news', title:'宁德时代固态电池中试线提前投产', subtitle:'第一财经 · 05-14', page:'', summary:'宁德时代位于宁德的固态电池中试线已提前投产，首批样品能量密度达到500Wh/kg。', source:'第一财经', date:'2026-05-14' },
+  { type:'news', title:'比亚迪智能驾驶部门扩招500人，L3量产冲刺', subtitle:'界面新闻 · 05-12', page:'', summary:'比亚迪近期大规模招聘智能驾驶工程师，计划年内实现L3级自动驾驶在高端车型量产搭载。', source:'界面新闻', date:'2026-05-12' },
 ];
 
 const searchStocksData = [
@@ -9691,9 +9736,9 @@ function openSearchResultPage() {
   `;
 
   // Tabs
-  const types = ['all','stock','meeting','minutes','calendar','research','report'];
-  const typeLabels = { all:'综合', stock:'个股', meeting:'专家会议', minutes:'纪要', calendar:'投资日历', research:'调研', report:'研报' };
-  const counts = { all: results.length, stock: results.filter(r=>r.type==='stock').length, meeting: results.filter(r=>r.type==='meeting').length, minutes: results.filter(r=>r.type==='minutes').length, calendar: results.filter(r=>r.type==='calendar').length, research: results.filter(r=>r.type==='research').length, report: results.filter(r=>r.type==='report').length };
+  const types = ['all','stock','meeting','minutes','calendar','research','report','announcement','news'];
+  const typeLabels = { all:'综合', stock:'个股', meeting:'专家会议', minutes:'纪要', calendar:'投资日历', research:'调研', report:'研报', announcement:'公告', news:'资讯' };
+  const counts = { all: results.length, stock: results.filter(r=>r.type==='stock').length, meeting: results.filter(r=>r.type==='meeting').length, minutes: results.filter(r=>r.type==='minutes').length, calendar: results.filter(r=>r.type==='calendar').length, research: results.filter(r=>r.type==='research').length, report: results.filter(r=>r.type==='report').length, announcement: results.filter(r=>r.type==='announcement').length, news: results.filter(r=>r.type==='news').length };
   searchActiveTab = 'all';
   document.getElementById('search-result-tabs').innerHTML = types.filter(t => t==='all' || counts[t] > 0).map(t => `
     <div class="home-vtab ${t==='all'?'active':''}" onclick="filterSearchResults('${t}')" style="padding:8px 16px; font-size:12px; font-weight:${t==='all'?'600':'500'}; cursor:pointer; border-bottom:2px solid ${t==='all'?'var(--accent-blue)':'transparent'}; color:${t==='all'?'var(--accent-blue)':'var(--text-muted)'};">${typeLabels[t]} (${counts[t]})</div>
@@ -9707,11 +9752,11 @@ function filterSearchResults(tab) {
   let results = searchResultsData.filter(r => r.title.toLowerCase().includes(val) || r.subtitle.toLowerCase().includes(val) || (r.summary && r.summary.toLowerCase().includes(val)));
   if (results.length === 0) results = [...searchResultsData];
   if (tab !== 'all') results = results.filter(r => r.type === tab);
-  const types = ['all','stock','meeting','minutes','calendar','research','report'];
-  const typeLabels = { all:'综合', stock:'个股', meeting:'专家会议', minutes:'纪要', calendar:'投资日历', research:'调研', report:'研报' };
+  const types = ['all','stock','meeting','minutes','calendar','research','report','announcement','news'];
+  const typeLabels = { all:'综合', stock:'个股', meeting:'专家会议', minutes:'纪要', calendar:'投资日历', research:'调研', report:'研报', announcement:'公告', news:'资讯' };
   let allResults = searchResultsData.filter(r => r.title.toLowerCase().includes(val) || r.subtitle.toLowerCase().includes(val) || (r.summary && r.summary.toLowerCase().includes(val)));
   if (allResults.length === 0) allResults = [...searchResultsData];
-  const counts = { all: allResults.length, stock: allResults.filter(r=>r.type==='stock').length, meeting: allResults.filter(r=>r.type==='meeting').length, minutes: allResults.filter(r=>r.type==='minutes').length, calendar: allResults.filter(r=>r.type==='calendar').length, research: allResults.filter(r=>r.type==='research').length, report: allResults.filter(r=>r.type==='report').length };
+  const counts = { all: allResults.length, stock: allResults.filter(r=>r.type==='stock').length, meeting: allResults.filter(r=>r.type==='meeting').length, minutes: allResults.filter(r=>r.type==='minutes').length, calendar: allResults.filter(r=>r.type==='calendar').length, research: allResults.filter(r=>r.type==='research').length, report: allResults.filter(r=>r.type==='report').length, announcement: allResults.filter(r=>r.type==='announcement').length, news: allResults.filter(r=>r.type==='news').length };
   document.getElementById('search-result-tabs').innerHTML = types.filter(t => t==='all' || counts[t] > 0).map(t => `
     <div class="home-vtab ${t===tab?'active':''}" onclick="filterSearchResults('${t}')" style="padding:8px 16px; font-size:12px; font-weight:${t===tab?'600':'500'}; cursor:pointer; border-bottom:2px solid ${t===tab?'var(--accent-blue)':'transparent'}; color:${t===tab?'var(--accent-blue)':'var(--text-muted)'};">${typeLabels[t]} (${counts[t]})</div>
   `).join('');
@@ -9719,8 +9764,8 @@ function filterSearchResults(tab) {
 }
 
 function renderSearchResults(results) {
-  const typeLabels = { stock:'个股', meeting:'专家会议', minutes:'纪要', calendar:'投资日历', research:'调研', report:'研报' };
-  const typeColors = { stock:'tag-cyan', meeting:'tag-blue', minutes:'tag-gold', calendar:'tag-green', research:'tag-cyan', report:'tag-blue' };
+  const typeLabels = { stock:'个股', meeting:'专家会议', minutes:'纪要', calendar:'投资日历', research:'调研', report:'研报', announcement:'公告', news:'资讯' };
+  const typeColors = { stock:'tag-cyan', meeting:'tag-blue', minutes:'tag-gold', calendar:'tag-green', research:'tag-cyan', report:'tag-blue', announcement:'tag-gold', news:'tag-blue' };
   const container = document.getElementById('search-result-list');
   if (results.length === 0) {
     container.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-muted);"><div style="font-size:32px; margin-bottom:12px;">🔍</div><div style="font-size:13px;">未找到相关结果，换个关键词试试</div></div>';
