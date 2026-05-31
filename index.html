@@ -8594,22 +8594,54 @@ function openMinutesDetail(id) {
   if (!item) return;
   const industryLabels = {ai:'AI',semiconductor:'半导体',newenergy:'新能源',medical:'医疗',finance:'金融',consume:'消费'};
   const orgLabels = {zhongxin:'中信证券',huatai:'华泰证券',guotai:'国泰君安',internal:'内部调研'};
-  const toc = ['会议详情', '专家介绍', '会议纪要'];
-  const content = buildMinutesContentHTML({
-    title: item.title,
-    industryLabel: industryLabels[item.industry] || item.industry,
-    expert: item.expert || '',
-    org: orgLabels[item.org] || item.org || '',
-    summary: item.summary,
-    stock: item.stock || '',
-    status: '回放'
-  });
+  const indLabel = industryLabels[item.industry] || item.industry;
+  const expert = item.expert || '';
+  const org = orgLabels[item.org] || item.org || '';
+  const toc = ['纪要总结', '纪要明细'];
+  const content = `
+    <h1 style="font-size:18px;font-weight:700;margin-bottom:8px;">${item.title}</h1>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      ${indLabel?'<span style="font-size:10px;padding:2px 8px;border:1px solid var(--blue);color:var(--blue);border-radius:4px;">'+indLabel+'</span>':''}
+      <span style="font-size:12px;color:#e8740a;font-weight:600;">▶ 回放</span>
+      ${expert?'<span style="font-size:12px;color:var(--text-sec);">主讲：'+expert+(org?' · '+org:'')+'</span>':''}
+    </div>
+    <div style="position:relative;background:#1a1f2e;border-radius:12px;overflow:hidden;margin-bottom:24px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <span style="font-size:28px;color:#e8740a;margin-left:4px;">▶</span>
+      </div>
+      <div style="position:absolute;bottom:12px;right:16px;background:rgba(0,0,0,0.7);color:#fff;font-size:12px;padding:2px 8px;border-radius:4px;">31:00</div>
+    </div>
+    <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border);">
+      <div class="sub-tab active" onclick="switchSubTab(this,'sub-summary')" style="padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--text);color:var(--text);margin-bottom:-1px;">纪要总结</div>
+      <div class="sub-tab" onclick="switchSubTab(this,'sub-detail')" style="padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted);margin-bottom:-1px;">纪要明细</div>
+    </div>
+    <div id="sub-summary">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:700;color:var(--blue);margin-bottom:10px;">◆ 核心观点</div>
+        <ul style="margin:0 0 0 18px;font-size:13px;line-height:2;color:var(--text-sec);">
+          <li>深度解析${indLabel}领域核心趋势，研判产业链关键拐点与投资节奏</li>
+          <li>梳理产业链上下游核心标的，明确受益确定性最高的环节</li>
+          <li>结合最新政策与市场数据，给出中短期配置建议</li>
+        </ul>
+      </div>
+      <div style="margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:700;color:var(--blue);margin-bottom:10px;">◆ 数据要点</div>
+        <ul style="margin:0 0 0 18px;font-size:13px;line-height:2;color:var(--text-sec);">
+          <li>行业景气度指标持续上行，核心公司订单能见度较高</li>
+          <li>产能利用率维持高位，供需格局持续改善</li>
+          <li>估值处于历史中位数偏下水平，性价比突出</li>
+        </ul>
+      </div>
+    </div>
+    <div id="sub-detail" style="display:none;">
+      <div style="font-size:13px;line-height:2;color:var(--text-sec);">
+        <p style="margin-bottom:12px;">${item.summary}</p>
+        <p style="margin-bottom:12px;">与会专家从技术可行性、市场空间、竞争壁垒三个维度给出了系统性分析。在技术层面，最新进展表明关键瓶颈正在被突破，预计未来6-12个月将看到明显的产品化成果。</p>
+        <p>在商业层面，头部客户已进入批量采购阶段，收入确认节奏加快。风险方面需关注政策不确定性、上游供应链约束以及海外竞品的追赶速度。</p>
+      </div>
+    </div>
+  `;
   openDetailPage({ title: item.title, toc, content, extraScript: `
-    function switchMinTab(el, tabId) {
-      el.parentElement.querySelectorAll('.mtab-btn').forEach(function(t){t.style.color='var(--text-muted)';t.style.fontWeight='500';t.style.borderBottom='2px solid transparent';});
-      el.style.color='var(--blue)';el.style.fontWeight='600';el.style.borderBottom='2px solid var(--blue)';
-      ['mtab-detail','mtab-expert','mtab-minutes'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display=id===tabId?'':'none';});
-    }
     function switchSubTab(el, tabId) {
       el.parentElement.querySelectorAll('.sub-tab').forEach(function(t){t.style.color='var(--text-muted)';t.style.fontWeight='500';t.style.borderBottom='2px solid transparent';});
       el.style.color='var(--text)';el.style.fontWeight='600';el.style.borderBottom='2px solid var(--text)';
