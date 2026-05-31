@@ -9482,17 +9482,20 @@ const researchData = [
 function renderResearch(data) {
   const list = document.getElementById('research-list');
   if (!list) return;
-  list.innerHTML = data.map(r => `
+  list.innerHTML = data.map(r => {
+    const isEnded = new Date(r.date) < new Date('2026-05-20');
+    return `
     <div class="card" style="padding:14px; border-left:4px solid ${r.color}; cursor:pointer;" onclick="openResearchDetail(${r.id})">
       <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
         <span class="tag" style="font-size:9px; padding:2px 6px; background:${r.color}15; color:${r.color};">${r.typeLabel}</span>
         <span style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">${r.date}</span>
+        <span class="status-badge ${isEnded ? 'status-done' : 'status-pending'}" style="font-size:9px;">${isEnded ? '已结束' : '未开始'}</span>
       </div>
       <div style="font-size:13px; font-weight:600; margin-bottom:6px;">${r.title}</div>
       <div style="font-size:11px; color:var(--text-secondary); line-height:1.5; margin-bottom:8px;">${r.summary}</div>
       ${r.stocks.length?`<div style="display:flex; gap:4px;">${r.stocks.map(s=>`<span class="tag tag-gold" style="font-size:9px; padding:1px 5px;">${s}</span>`).join('')}</div>`:''}
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 let researchFilterState = { type:'all', industry:'all' };
