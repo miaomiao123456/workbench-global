@@ -8637,10 +8637,10 @@ function openResearchDetail(id) {
         </div>
       </div>
     </div>
-    <div style="margin-top:16px;display:flex;gap:12px;">
-      <button style="padding:10px 32px;background:#e8740a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;" onclick="alert('已提交报名申请')">立即报名</button>
+    ${!isEnded ? `<div style="margin-top:16px;display:flex;gap:12px;">
+      <button id="res-signup-btn" style="padding:10px 32px;background:#e8740a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;" onclick="resSignup(this)">立即报名</button>
       <button style="padding:10px 24px;background:var(--bg);color:var(--text-sec);border:1px solid var(--border);border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;" onclick="alert('分享链接已复制')">分享</button>
-    </div>
+    </div>` : ''}
   `;
 
   const minutesContent = `
@@ -8688,6 +8688,12 @@ function openResearchDetail(id) {
         var e = document.getElementById(id);
         if (e) e.style.display = id === tabId ? '' : 'none';
       });
+    }
+    function resSignup(btn) {
+      btn.textContent = '已报名';
+      btn.style.background = '#9aa3b4';
+      btn.style.cursor = 'default';
+      btn.onclick = null;
     }
   ` });
 }
@@ -9477,6 +9483,10 @@ const researchData = [
   { id:8, date:'2026-05-02', endDate:'2026-05-02 17:00', type:'field', title:'比亚迪常州工厂智能化升级', industry:'newenergy', stocks:['比亚迪'], summary:'产线AI质检覆盖率提升至95%，机器人密度达到300台/万人，自动化水平行业领先。', typeLabel:'实地调研', color:'#2d7ff9', registration:'审核报名', target:'比亚迪常州工厂', attendees:'比亚迪制造中心负责人', location:'江苏省常州市新北区太湖西路88号' },
   { id:9, date:'2026-04-28', endDate:'2026-04-28 18:00', type:'grassroot', title:'上海AI创业公司生态调研', industry:'ai', stocks:[], summary:'走访张江/漕河泾20+AI初创公司，多数聚焦垂直行业Agent应用，融资环境较2024年明显回暖。', typeLabel:'草根调研', color:'#8b5cf6', registration:'自由参加', target:'张江/漕河泾AI创业公司', attendees:'多家AI初创团队', location:'上海市浦东新区张江高科技园区' },
   { id:10, date:'2026-04-25', endDate:'2026-04-25 16:00', type:'expert-call', title:'北方华创新品发布前瞻', industry:'semiconductor', stocks:['北方华创'], summary:'12英寸刻蚀设备新品即将发布，制程覆盖至14nm以下，国内晶圆厂验证进展顺利。', typeLabel:'专家电话会', color:'#00b894', registration:'免费参与', target:'北方华创', attendees:'北方华创产品总监', location:'线上·腾讯会议' },
+  { id:11, date:'2026-05-25', endDate:'2026-05-25 17:00', type:'field', title:'走进阶跃星辰：大模型商业化路径探讨', industry:'ai', stocks:['千里科技'], summary:'参观训练集群+技术座谈，重点了解B端API商业化进展与C端产品路线图。', typeLabel:'实地调研', color:'#2d7ff9', registration:'审核报名', target:'阶跃星辰', attendees:'阶跃星辰CTO、产品负责人', location:'北京市海淀区中关村智造大街G座12层' },
+  { id:12, date:'2026-05-23', endDate:'2026-05-23 17:00', type:'field', title:'千里科技深圳研发中心开放日', industry:'ai', stocks:['千里科技'], summary:'实地验证AI终端产品研发进度，自研NPU实测体验，产线参观。', typeLabel:'实地调研', color:'#2d7ff9', registration:'审核报名', target:'千里科技', attendees:'千里科技研发VP', location:'深圳市南山区粤海街道科技园南区T3栋' },
+  { id:13, date:'2026-05-22', endDate:'2026-05-22 17:30', type:'expert-call', title:'英伟达H20产业链投资策略会', industry:'semiconductor', stocks:['中科曙光','中际旭创'], summary:'覆盖PCB/基板/光模块/服务器四条主线，发布产业链受益标的清单。', typeLabel:'策略会', color:'#00b894', registration:'免费参与', target:'英伟达H20产业链', attendees:'华泰证券电子首席', location:'线上·腾讯会议' },
+  { id:14, date:'2026-05-28', endDate:'2026-05-28 16:00', type:'grassroot', title:'GLP-1减重药产业链深度路演', industry:'medical', stocks:[], summary:'全球GLP-1市场规模测算，国内仿制药/创新药竞争格局拆解。', typeLabel:'路演', color:'#8b5cf6', registration:'免费参与', target:'GLP-1产业链企业', attendees:'中信证券医药首席', location:'线上·Zoom' },
 ];
 
 function renderResearch(data) {
