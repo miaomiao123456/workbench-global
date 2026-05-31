@@ -3886,7 +3886,7 @@ body {
       <button style="background:none; border:none; font-size:18px; color:var(--text-muted); cursor:pointer;" onclick="closeGlobalAiPanel()">✕</button>
     </div>
   </div>
-  <div id="ai-chat-messages" style="flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:14px;">
+  <div id="panel-chat-messages" style="flex:1; overflow-y:auto; padding:16px 18px; display:flex; flex-direction:column; gap:14px;">
     <div class="ai-chat-bubble ai-msg">
       <div class="ai-chat-avatar">✦</div>
       <div class="ai-chat-content">
@@ -3895,7 +3895,7 @@ body {
     </div>
   </div>
   <div style="padding:10px 18px 14px; border-top:1px solid var(--border); display:flex; gap:8px; align-items:center;">
-    <input id="ai-chat-input" class="form-input" style="flex:1; margin:0; font-size:12px;" placeholder="输入你的需求..." />
+    <input id="panel-chat-input" class="form-input" style="flex:1; margin:0; font-size:12px;" placeholder="输入你的需求..." onkeydown="if(event.key==='Enter')sendAiChat()" />
     <button class="btn btn-primary btn-sm" onclick="sendAiChat()" style="white-space:nowrap;">发送</button>
   </div>
 </div>
@@ -6025,8 +6025,16 @@ function toggleUserPopover(e) {
 document.addEventListener('click', () => { const p = document.getElementById('user-popover'); if (p) p.style.display = 'none'; });
 
 // ========== AI CHAT SYSTEM ==========
-function getChatEl() { return document.getElementById('ai-chat-messages'); }
-function getChatInput() { return document.getElementById('ai-chat-input'); }
+function getChatEl() {
+  const panel = document.getElementById('global-ai-panel');
+  if (panel && panel.style.display === 'flex') return document.getElementById('panel-chat-messages');
+  return document.getElementById('ai-chat-messages');
+}
+function getChatInput() {
+  const panel = document.getElementById('global-ai-panel');
+  if (panel && panel.style.display === 'flex') return document.getElementById('panel-chat-input');
+  return document.getElementById('ai-chat-input');
+}
 let chatState = { step: 0, name: '', sources: '', keywords: '', freq: '', time: '' };
 let chatMode = 'general';
 let interviewState = { step: 0, industry: '', topic: '', expert: '' };
@@ -6173,7 +6181,7 @@ function sendAiChat() {
 }
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && e.target && e.target.id === 'ai-chat-input') sendAiChat();
+  if (e.key === 'Enter' && e.target && (e.target.id === 'ai-chat-input' || e.target.id === 'panel-chat-input')) sendAiChat();
 });
 
 // ========== AI THREE-STATE SYSTEM ==========
@@ -9235,7 +9243,7 @@ function bindSuggestions() {
   setTimeout(() => {
     document.querySelectorAll('.ai-suggestion').forEach(s => {
       s.addEventListener('click', () => {
-        const input = document.getElementById('ai-chat-input');
+        const input = getChatInput();
         input.value = s.dataset.text;
         sendAiChat();
       });
@@ -9357,7 +9365,7 @@ function closeGlobalAiPanel() {
 }
 
 function resetAiChat(welcomeText) {
-  const messagesEl = document.getElementById('ai-chat-messages');
+  const messagesEl = document.getElementById('panel-chat-messages');
   messagesEl.innerHTML = `
     <div class="ai-chat-bubble ai-msg">
       <div class="ai-chat-avatar">✦</div>
