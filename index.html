@@ -2324,6 +2324,10 @@ body {
     <span class="nav-icon">◇</span>
     <span>纪要</span>
   </div>
+  <div class="nav-item" data-page="stock">
+    <span class="nav-icon">◆</span>
+    <span>个股</span>
+  </div>
   <div class="nav-item" data-page="calendar">
     <span class="nav-icon">◫</span>
     <span>投资日历</span>
@@ -9763,7 +9767,7 @@ function openSearchResultPage() {
   `;
 
   // Tabs
-  const types = ['all','stock','meeting','minutes','calendar','research','report','announcement','news'];
+  const types = ['all','meeting','minutes','calendar','research','report','announcement','news'];
   const typeLabels = { all:'综合', stock:'个股', meeting:'专家会议', minutes:'纪要', calendar:'投资日历', research:'调研', report:'研报', announcement:'公告', news:'资讯' };
   const counts = { all: results.length, stock: results.filter(r=>r.type==='stock').length, meeting: results.filter(r=>r.type==='meeting').length, minutes: results.filter(r=>r.type==='minutes').length, calendar: results.filter(r=>r.type==='calendar').length, research: results.filter(r=>r.type==='research').length, report: results.filter(r=>r.type==='report').length, announcement: results.filter(r=>r.type==='announcement').length, news: results.filter(r=>r.type==='news').length };
   searchActiveTab = 'all';
@@ -9779,7 +9783,7 @@ function filterSearchResults(tab) {
   let results = searchResultsData.filter(r => r.title.toLowerCase().includes(val) || r.subtitle.toLowerCase().includes(val) || (r.summary && r.summary.toLowerCase().includes(val)));
   if (results.length === 0) results = [...searchResultsData];
   if (tab !== 'all') results = results.filter(r => r.type === tab);
-  const types = ['all','stock','meeting','minutes','calendar','research','report','announcement','news'];
+  const types = ['all','meeting','minutes','calendar','research','report','announcement','news'];
   const typeLabels = { all:'综合', stock:'个股', meeting:'专家会议', minutes:'纪要', calendar:'投资日历', research:'调研', report:'研报', announcement:'公告', news:'资讯' };
   let allResults = searchResultsData.filter(r => r.title.toLowerCase().includes(val) || r.subtitle.toLowerCase().includes(val) || (r.summary && r.summary.toLowerCase().includes(val)));
   if (allResults.length === 0) allResults = [...searchResultsData];
