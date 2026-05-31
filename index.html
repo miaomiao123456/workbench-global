@@ -2324,10 +2324,6 @@ body {
     <span class="nav-icon">◇</span>
     <span>纪要</span>
   </div>
-  <div class="nav-item" data-page="stock">
-    <span class="nav-icon">◆</span>
-    <span>个股</span>
-  </div>
   <div class="nav-item" data-page="calendar">
     <span class="nav-icon">◫</span>
     <span>投资日历</span>
@@ -3265,7 +3261,7 @@ body {
     <!-- Stock Tabs -->
     <div class="monitor-tabs" style="margin-bottom:16px;" id="stock-tabs">
       <div class="monitor-tab active" onclick="switchStockTab(this,'expert')">专家会议</div>
-      <div class="monitor-tab" onclick="switchStockTab(this,'roadshow')">路演</div>
+      <div class="monitor-tab" onclick="switchStockTab(this,'roadshow')">调研/路演/策略会</div>
       <div class="monitor-tab" onclick="switchStockTab(this,'minutes')">纪要</div>
       <div class="monitor-tab" onclick="switchStockTab(this,'reports')">研报</div>
       <div class="monitor-tab" onclick="switchStockTab(this,'announcements')">公告</div>
@@ -4131,21 +4127,27 @@ function renderStockTabContent() {
       </div>
     `).join('');
   } else if (currentStockTab === 'roadshow') {
-    const roadshows = stockRoadshowData;
-    container.innerHTML = roadshows.map(r => `
-      <div class="card" style="padding:14px; margin-bottom:10px;">
+    const items = researchData.filter(r => r.stocks && r.stocks.includes(stock));
+    const allItems = items.length > 0 ? items : researchData.slice(0, 5);
+    container.innerHTML = allItems.map(r => {
+      const isEnded = new Date(r.date) < new Date('2026-05-20');
+      return `
+      <div class="card" style="padding:14px; margin-bottom:10px; cursor:pointer;" onclick="openResearchDetail(${r.id})">
         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
           <div>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+              <span class="tag" style="font-size:9px; padding:2px 6px; background:${r.color}15; color:${r.color};">${r.typeLabel}</span>
+            </div>
             <div style="font-size:13px; font-weight:600;">${r.title}</div>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">${r.host} | ${r.date}</div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">${r.summary}</div>
           </div>
-          <div style="display:flex; align-items:center; gap:6px;">
-            <span class="tag tag-blue" style="font-size:9px;">${r.type}</span>
-            <span class="status-badge ${r.status === '已结束' ? 'status-done' : 'status-pending'}" style="font-size:9px;">${r.status}</span>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0;">
+            <span style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">${r.date}</span>
+            <span class="status-badge ${isEnded ? 'status-done' : 'status-pending'}" style="font-size:9px;">${isEnded ? '已结束' : '待开始'}</span>
           </div>
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   } else if (currentStockTab === 'minutes') {
     const notes = minutesData.filter(n => n.stock === stock);
     const allNotes = notes.length > 0 ? notes : minutesData.slice(0, 5);
@@ -8515,6 +8517,7 @@ function scrollToSection(id) {
   document.querySelectorAll('.toc-item').forEach(el => el.classList.remove('active'));
   event.target.classList.add('active');
 }
+${opts.extraScript || ''}
 </` + `script>
 </body>
 </html>`);
@@ -8617,48 +8620,72 @@ function openResearchDetail(id) {
   `).join('');
 
   const detailBlock = `
-    <div style="padding:16px 0;border-bottom:1px solid var(--border);">
-      <div style="width:100px;font-size:13px;color:var(--blue);font-weight:500;margin-bottom:12px;">活动详情</div>
-      <div style="background:var(--bg);border-radius:8px;padding:16px;font-size:13px;line-height:1.8;color:var(--text-sec);">
-        <p style="margin-bottom:6px;"><strong>${item.title}</strong></p>
-        <p style="margin-bottom:6px;">出席人：${item.attendees || '--'}</p>
-        <p style="margin-bottom:6px;">时间：${item.date} 14:00</p>
-        <p>${item.summary}</p>
+    <div style="padding:16px 0;">
+      <div style="display:flex;padding:16px 0;border-bottom:1px solid var(--border);">
+        <div style="width:100px;flex-shrink:0;font-size:13px;color:var(--blue);font-weight:500;">活动详情</div>
+        <div style="flex:1;">
+          <div style="background:var(--bg);border-radius:8px;padding:16px;font-size:13px;line-height:1.8;color:var(--text-sec);">
+            <p style="margin-bottom:6px;"><strong>${item.title}</strong></p>
+            <p style="margin-bottom:6px;">出席人：${item.attendees || '--'}</p>
+            <p style="margin-bottom:6px;">时间：${item.date} 14:00</p>
+            <p>${item.summary}</p>
+          </div>
+        </div>
       </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:12px;">
+      <button style="padding:10px 32px;background:#e8740a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;" onclick="alert('已提交报名申请')">立即报名</button>
+      <button style="padding:10px 24px;background:var(--bg);color:var(--text-sec);border:1px solid var(--border);border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;" onclick="alert('分享链接已复制')">分享</button>
     </div>
   `;
 
-  let bottomSection = '';
-  if (isEnded) {
-    bottomSection = `
-      <h2 id="sec1" style="margin-top:28px;">纪要内容</h2>
-      <div class="highlight"><p>以下为活动纪要，由AI基于现场记录自动生成。</p></div>
-      <ul>
-        <li>产业趋势验证：实地调研确认行业景气度与案头研究结论一致，核心环节供需偏紧</li>
-        <li>竞争格局：龙头厂商技术壁垒持续加深，二线厂商差异化突围路径逐步明确</li>
-        <li>商业化进展：头部客户订单落地节奏符合预期，收入确认有望加速</li>
-        <li>风险关注：上游原材料价格波动、行业产能扩张节奏及海外政策不确定性</li>
+  const minutesContent = `
+    <div style="font-size:13px;line-height:2;color:var(--text-sec);">
+      <p style="margin-bottom:12px;">本次${item.typeLabel}围绕「${item.title}」主题展开，重点讨论了以下几个方面：</p>
+      <p style="margin-bottom:8px;"><strong>一、行业现状与趋势</strong></p>
+      <p style="margin-bottom:12px;">${item.summary}</p>
+      <p style="margin-bottom:8px;"><strong>二、核心发现</strong></p>
+      <ul style="margin:8px 0 16px 18px;">
+        <li>产业趋势验证：实地调研确认行业景气度与案头研究结论一致，核心环节供需偏紧。</li>
+        <li>竞争格局方面：龙头厂商技术壁垒持续加深，二线厂商差异化突围路径逐步明确。</li>
+        <li>商业化进展：头部客户订单落地节奏符合预期，收入确认有望加速。</li>
       </ul>
-      <h2 id="sec2">相关标的</h2>
-      <ul>
+      <p style="margin-bottom:8px;"><strong>三、风险提示</strong></p>
+      <p style="margin-bottom:12px;">需关注上游原材料价格波动、行业产能扩张节奏以及海外政策不确定性。整体判断：当前处于产业加速期，建议沿核心环节积极配置。</p>
+      <p style="margin-bottom:8px;"><strong>四、相关标的</strong></p>
+      <ul style="margin:8px 0 16px 18px;">
         ${item.stocks.length ? item.stocks.map(s => '<li><strong>' + s + '</strong> — 核心受益标的，建议关注</li>').join('') : '<li>暂无明确关联个股</li>'}
       </ul>
-    `;
-  } else {
-    bottomSection = `
-      <div id="sec1" style="margin-top:28px;display:flex;gap:12px;">
-        <button style="padding:10px 32px;background:#e8740a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;" onclick="alert('已提交报名申请')">立即报名</button>
-        <button style="padding:10px 24px;background:var(--bg);color:var(--text-sec);border:1px solid var(--border);border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;" onclick="alert('分享链接已复制')">分享</button>
-      </div>
-    `;
-  }
-
-  const toc = isEnded ? ['活动信息', '纪要内容', '相关标的'] : ['活动信息', '报名'];
-  const content = `
-    <div id="sec0">${infoTable}${detailBlock}</div>
-    ${bottomSection}
+    </div>
   `;
-  openDetailPage({ title: item.title, toc, content });
+
+  const tabsHtml = isEnded ? `
+    <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border);">
+      <div class="res-tab-btn" onclick="switchResDetailTab(this,'res-tab-detail')" style="padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--blue);color:var(--blue);">活动详情</div>
+      <div class="res-tab-btn" onclick="switchResDetailTab(this,'res-tab-minutes')" style="padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted);">活动纪要</div>
+    </div>
+    <div id="res-tab-detail">${infoTable}${detailBlock}</div>
+    <div id="res-tab-minutes" style="display:none;">${minutesContent}</div>
+  ` : `${infoTable}${detailBlock}`;
+
+  const toc = isEnded ? ['活动详情', '活动纪要'] : ['活动信息'];
+  const content = tabsHtml;
+  openDetailPage({ title: item.title, toc, content, extraScript: `
+    function switchResDetailTab(el, tabId) {
+      el.parentElement.querySelectorAll('.res-tab-btn').forEach(function(t) {
+        t.style.color = 'var(--text-muted)';
+        t.style.fontWeight = '500';
+        t.style.borderBottom = '2px solid transparent';
+      });
+      el.style.color = 'var(--blue)';
+      el.style.fontWeight = '600';
+      el.style.borderBottom = '2px solid var(--blue)';
+      ['res-tab-detail','res-tab-minutes'].forEach(function(id) {
+        var e = document.getElementById(id);
+        if (e) e.style.display = id === tabId ? '' : 'none';
+      });
+    }
+  ` });
 }
 
 function openFeedDetail(idx) {
