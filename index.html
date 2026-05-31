@@ -6148,7 +6148,26 @@ function sendAiChat() {
       addChatBubble(`正在基于「${msg}」生成点评...<br><br>已分析今日信源，为你提炼核心投资观点：<div class="ai-chat-artifact" onclick="expandToGlobal()"><div class="ai-chat-artifact-icon">✦</div><div class="ai-chat-artifact-info"><div class="ai-chat-artifact-title">${msg} — 投研点评</div><div class="ai-chat-artifact-meta">AI 生成 · 4 条点评 · 刚刚</div></div><div class="ai-chat-artifact-arrow">查看 →</div></div>`, false);
       setTimeout(() => setAixTaskRunning(false), 1000);
     } else {
-      addChatBubble(`好的，我来帮你分析「${msg}」...<br><br>基于当前市场数据和 AI 模型分析，已为你生成分析摘要：<div class="ai-chat-artifact" onclick="expandToGlobal()"><div class="ai-chat-artifact-icon">📊</div><div class="ai-chat-artifact-info"><div class="ai-chat-artifact-title">${msg} — 分析报告</div><div class="ai-chat-artifact-meta">AI 生成 · 综合分析 · 刚刚</div></div><div class="ai-chat-artifact-arrow">查看 →</div></div>`, false);
+      setAixTaskRunning(true);
+      addChatBubble(`收到，正在为你分析「${msg}」...`, false);
+      setTimeout(() => {
+        setAixTaskRunning(false);
+        addChatBubble(`基于最新市场数据和产业链信息，已为你生成分析结果：
+
+<div class="ai-chat-artifact" onclick="expandToGlobal()" style="margin-top:10px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.08)'" onmouseout="this.style.boxShadow='none'">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+    <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,rgba(45,127,249,0.1),rgba(0,184,148,0.1));display:flex;align-items:center;justify-content:center;font-size:16px;">📊</div>
+    <div style="flex:1;">
+      <div style="font-size:13px;font-weight:600;color:var(--text-primary);">${msg} — 投研分析</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">AI 生成 · 综合分析 · 刚刚</div>
+    </div>
+    <span style="font-size:11px;color:var(--accent-blue);font-weight:600;">查看 →</span>
+  </div>
+  <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;">
+    核心结论：行业景气度持续上行，龙头公司竞争壁垒深厚。建议关注产业链核心环节的配置机会，短期催化因素明确。
+  </div>
+</div>`, false);
+      }, 2000);
     }
   }, 500);
 }
