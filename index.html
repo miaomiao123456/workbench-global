@@ -3382,10 +3382,9 @@ body {
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
           <span style="font-size:11px; color:var(--text-muted); font-weight:600; min-width:48px;">类型</span>
           <div class="filter-chip active" data-filter="research-type" data-value="all" onclick="toggleResearchChip(this,'research-type')">全部</div>
-          <div class="filter-chip" data-filter="research-type" data-value="field" onclick="toggleResearchChip(this,'research-type')">实地调研</div>
-          <div class="filter-chip" data-filter="research-type" data-value="expert-call" onclick="toggleResearchChip(this,'research-type')">专家电话会</div>
-          <div class="filter-chip" data-filter="research-type" data-value="chain" onclick="toggleResearchChip(this,'research-type')">产业链验证</div>
-          <div class="filter-chip" data-filter="research-type" data-value="grassroot" onclick="toggleResearchChip(this,'research-type')">草根调研</div>
+          <div class="filter-chip" data-filter="research-type" data-value="diaoyan" onclick="toggleResearchChip(this,'research-type')">调研</div>
+          <div class="filter-chip" data-filter="research-type" data-value="luyan" onclick="toggleResearchChip(this,'research-type')">路演</div>
+          <div class="filter-chip" data-filter="research-type" data-value="celve" onclick="toggleResearchChip(this,'research-type')">策略会</div>
         </div>
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
           <span style="font-size:11px; color:var(--text-muted); font-weight:600; min-width:48px;">行业</span>
@@ -9526,7 +9525,9 @@ function applyResearchFilter() {
   const s = researchFilterState;
   const q = (document.getElementById('research-search')?.value || '').trim().toLowerCase();
   let filtered = researchData.filter(r => {
-    if (s.type!=='all' && r.type!==s.type) return false;
+    if (s.type==='diaoyan' && r.type!=='field' && r.type!=='chain' && r.type!=='grassroot') return false;
+    if (s.type==='luyan' && r.typeLabel!=='路演') return false;
+    if (s.type==='celve' && r.typeLabel!=='策略会') return false;
     if (s.industry!=='all' && r.industry!==s.industry) return false;
     if (q && !r.title.toLowerCase().includes(q) && !(r.summary||'').toLowerCase().includes(q) && !(r.stocks||[]).some(st=>st.toLowerCase().includes(q))) return false;
     return true;
