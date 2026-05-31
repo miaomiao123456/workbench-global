@@ -8346,7 +8346,7 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
 .detail-top-header .logo-area{display:flex;align-items:center;gap:10px;}
 .detail-top-header .logo-icon{height:28px;width:auto;}
 .detail-top-header .slogan{font-size:13px;color:var(--cyan);font-weight:500;}
-.detail-body{display:grid;grid-template-columns:200px 1fr;flex:1;overflow:hidden;}
+.detail-body{display:grid;grid-template-columns:200px 380px 1fr;flex:1;overflow:hidden;}
 .sidebar{background:var(--bg-card);border-right:1px solid var(--border);padding:0;overflow-y:auto;display:flex;flex-direction:column;}
 .sidebar .nav-section-label{padding:16px 20px 8px;font-size:10px;color:var(--text-muted);letter-spacing:0.5px;}
 .nav-item{display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:12px;color:var(--text-sec);cursor:pointer;border-left:2px solid transparent;transition:all .15s;}
@@ -8376,7 +8376,7 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
 .content li{font-size:12px;line-height:1.8;color:var(--text-sec);margin-bottom:4px;}
 .content .highlight{background:rgba(45,127,249,0.06);border-left:3px solid var(--blue);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;}
 .content .highlight p{margin:0;font-size:12px;font-weight:500;color:var(--text);}
-.ai-chat-panel{background:var(--bg-card);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.ai-chat-panel{background:var(--bg-card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
 .ai-chat-header{padding:16px 20px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text);}
 .ai-chat-messages{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
 .ai-chat-msg{display:flex;flex-direction:column;gap:4px;}
@@ -8419,40 +8419,31 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
     </div>
   </div>
 </aside>
+<div class="ai-chat-panel">
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;">
+    <span style="color:var(--cyan);">✦</span> AI 对话
+  </div>
+  <div id="ai-chat-messages" style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
+    <div style="background:rgba(0,184,148,0.08);border-radius:2px 10px 10px 10px;padding:10px 12px;font-size:12px;line-height:1.7;color:var(--text);">
+      你好！关于「${(opts.title||'').replace(/'/g,"\\'")}」，你想了解什么？我可以帮你提取要点、深度分析或生成总结。
+    </div>
+  </div>
+  <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;">
+    <input id="ai-chat-input" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12px;outline:none;background:var(--bg);color:var(--text);font-family:inherit;" placeholder="输入问题..." onkeydown="if(event.key==='Enter'){sendDetailChat()}" />
+    <button style="padding:6px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;" onclick="sendDetailChat()">发送</button>
+  </div>
+</div>
 <main class="content">
   ${opts.content || ''}
 </main>
-<!-- AI悬浮球 -->
-<div id="ai-float-ball" style="position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#2d7ff9,#00b894);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(45,127,249,0.35);z-index:9999;transition:transform 0.2s;" onclick="toggleAiFloatPanel()" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
-  <span style="font-size:20px;color:#fff;">✦</span>
-</div>
-<div id="ai-float-panel" style="position:fixed;bottom:80px;right:24px;width:340px;height:420px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.15);display:none;flex-direction:column;overflow:hidden;z-index:9998;border:1px solid #e2e6ef;">
-  <div style="padding:14px 18px;border-bottom:1px solid #e2e6ef;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;">
-    <div style="display:flex;align-items:center;gap:8px;"><span style="color:#00b894;">✦</span> AI 问答</div>
-    <span style="cursor:pointer;color:var(--text-muted);font-size:16px;" onclick="toggleAiFloatPanel()">✕</span>
-  </div>
-  <div id="ai-float-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-    <div style="background:rgba(0,184,148,0.08);border-radius:2px 10px 10px 10px;padding:10px 12px;font-size:12px;line-height:1.7;color:#1a1f2e;">
-      你好！我是AI投研助手，可以针对这篇内容为你解答疑问、提取要点、生成总结。请问有什么需要帮助的？
-    </div>
-  </div>
-  <div style="padding:10px 14px;border-top:1px solid #e2e6ef;display:flex;gap:6px;">
-    <input id="ai-float-input" style="flex:1;padding:8px 12px;border:1px solid #e2e6ef;border-radius:8px;font-size:12px;outline:none;font-family:inherit;" placeholder="向AI提问..." onfocus="this.style.borderColor='#2d7ff9'" onblur="this.style.borderColor='#e2e6ef'" onkeydown="if(event.key==='Enter'){sendAiFloatMsg()}"/>
-    <button style="padding:6px 14px;background:#2d7ff9;color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;" onclick="sendAiFloatMsg()">发送</button>
-  </div>
-</div>
 <` + `script>
-function toggleAiFloatPanel(){
-  var p=document.getElementById('ai-float-panel');
-  p.style.display=p.style.display==='flex'?'none':'flex';
-}
-function sendAiFloatMsg(){
-  var inp=document.getElementById('ai-float-input');
+function sendDetailChat(){
+  var inp=document.getElementById('ai-chat-input');
   var txt=inp.value.trim();
   if(!txt)return;
-  var msgs=document.getElementById('ai-float-messages');
+  var msgs=document.getElementById('ai-chat-messages');
   msgs.innerHTML+='<div style="align-self:flex-end;background:#2d7ff9;color:#fff;border-radius:10px 2px 10px 10px;padding:10px 12px;font-size:12px;line-height:1.6;max-width:80%;">'+txt+'</div>';
-  msgs.innerHTML+='<div style="background:rgba(0,184,148,0.08);border-radius:2px 10px 10px 10px;padding:10px 12px;font-size:12px;line-height:1.7;color:#1a1f2e;">收到你的问题，AI正在分析中...（此为演示回复）</div>';
+  msgs.innerHTML+='<div style="background:rgba(0,184,148,0.08);border-radius:2px 10px 10px 10px;padding:10px 12px;font-size:12px;line-height:1.7;color:var(--text);">这是个好问题。根据产业链调研，核心逻辑仍然成立，建议关注业绩兑现节奏与机构持仓变化。需要我展开某个方面吗？</div>';
   inp.value='';
   msgs.scrollTop=msgs.scrollHeight;
 }
@@ -8536,6 +8527,38 @@ function openReportDetail(id) {
       <li>行业竞争加剧导致毛利率下行</li>
       <li>新产品研发进度不及预期</li>
       <li>宏观经济波动影响企业资本开支意愿</li>
+    </ul>
+  `;
+  openDetailPage({ title: item.title, toc, content });
+}
+
+function openResearchDetail(id) {
+  const item = researchData.find(r => r.id === id);
+  if (!item) return;
+  const toc = ['调研概述', '核心发现', '详细内容', '相关标的'];
+  const content = `
+    <h1>${item.title}</h1>
+    <div class="meta">
+      <span>${item.date}</span>
+      <span class="tag" style="background:${item.color}15;color:${item.color};">${item.typeLabel}</span>
+      ${item.stocks.length ? item.stocks.map(s => '<span class="tag">' + s + '</span>').join('') : ''}
+    </div>
+    <h2 id="sec0">调研概述</h2>
+    <p>${item.summary}</p>
+    <h2 id="sec1">核心发现</h2>
+    <div class="highlight"><p>以下为调研核心发现，供投资决策参考。</p></div>
+    <ul>
+      <li>产业趋势验证：实地调研确认行业景气度与案头研究结论一致，核心环节供需偏紧</li>
+      <li>竞争格局：龙头厂商技术壁垒持续加深，二线厂商差异化突围路径逐步明确</li>
+      <li>商业化进展：头部客户订单落地节奏符合预期，收入确认有望加速</li>
+    </ul>
+    <h2 id="sec2">详细内容</h2>
+    <p>本次${item.typeLabel}围绕行业核心环节展开，通过实地走访和深度交流，验证了产业链关键假设。</p>
+    <p>在技术维度，最新研发进展表明核心技术指标达到预期水平，量产条件已基本具备。在需求侧，下游客户反馈积极，采购意愿和预算规模均有明显提升。</p>
+    <p>风险层面需关注上游原材料价格波动、行业产能扩张节奏以及海外政策不确定性。整体判断：当前处于产业加速期，建议沿核心环节积极配置。</p>
+    <h2 id="sec3">相关标的</h2>
+    <ul>
+      ${item.stocks.length ? item.stocks.map(s => '<li><strong>' + s + '</strong> — 核心受益标的，建议关注</li>').join('') : '<li>暂无明确关联个股</li>'}
     </ul>
   `;
   openDetailPage({ title: item.title, toc, content });
@@ -9184,7 +9207,7 @@ function renderMinutes(data) {
   if (!grid) return;
   const typeColor = t => t==='expert' ? '#00b894' : '#2d7ff9';
   grid.innerHTML = data.map(m => `
-    <div class="card" style="padding:14px; border-left:4px solid ${typeColor(m.type)}; cursor:pointer;" onclick="showToast('打开纪要详情：${m.title}')">
+    <div class="card" style="padding:14px; border-left:4px solid ${typeColor(m.type)}; cursor:pointer;" onclick="openMinutesDetail(${m.id})">
       <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
         <span class="tag" style="font-size:9px; padding:2px 6px; background:${typeColor(m.type)}15; color:${typeColor(m.type)};">${m.type==='expert'?'专家纪要':'常规纪要'}</span>
         <span style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">${m.date}</span>
@@ -9332,7 +9355,7 @@ function renderResearch(data) {
   const list = document.getElementById('research-list');
   if (!list) return;
   list.innerHTML = data.map(r => `
-    <div class="card" style="padding:14px; border-left:4px solid ${r.color}; cursor:pointer;" onclick="showToast('打开调研详情：${r.title}')">
+    <div class="card" style="padding:14px; border-left:4px solid ${r.color}; cursor:pointer;" onclick="openResearchDetail(${r.id})">
       <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
         <span class="tag" style="font-size:9px; padding:2px 6px; background:${r.color}15; color:${r.color};">${r.typeLabel}</span>
         <span style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">${r.date}</span>
@@ -9388,7 +9411,7 @@ function renderReports(data) {
   const list = document.getElementById('reports-list');
   if (!list) return;
   list.innerHTML = data.map(r => `
-    <div class="card" style="padding:14px; cursor:pointer;" onclick="showToast('打开研报：${r.title}')">
+    <div class="card" style="padding:14px; cursor:pointer;" onclick="openReportDetail(${r.id})">
       <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
         <span style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">${r.date}</span>
         ${r.rating?`<span class="tag ${r.rating==='买入'?'tag-cyan':r.rating==='推荐'?'tag-blue':'tag-gold'}" style="font-size:9px; padding:1px 5px;">${r.rating}</span>`:''}
