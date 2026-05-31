@@ -3268,6 +3268,8 @@ body {
       <div class="monitor-tab" onclick="switchStockTab(this,'roadshow')">路演</div>
       <div class="monitor-tab" onclick="switchStockTab(this,'minutes')">纪要</div>
       <div class="monitor-tab" onclick="switchStockTab(this,'reports')">研报</div>
+      <div class="monitor-tab" onclick="switchStockTab(this,'announcements')">公告</div>
+      <div class="monitor-tab" onclick="switchStockTab(this,'news')">资讯</div>
     </div>
 
     <!-- Stock Tab Content -->
@@ -4080,6 +4082,28 @@ function handleStockPageSearch(e) {
   }
 }
 
+const stockAnnouncementsData = [
+  { stock:'千里科技', title:'关于获得政府补助的公告', type:'日常经营', date:'2026-05-19', source:'上交所', summary:'公司及子公司近期收到各项政府补助共计人民币3,200万元，其中与收益相关的政府补助2,800万元。' },
+  { stock:'千里科技', title:'关于签署战略合作框架协议的公告', type:'重大事项', date:'2026-05-17', source:'上交所', summary:'公司与阶跃星辰签署战略合作协议，双方将在端侧大模型部署、NPU芯片适配等领域展开深度合作。' },
+  { stock:'千里科技', title:'2026年第一季度报告', type:'定期报告', date:'2026-05-15', source:'上交所', summary:'Q1实现营业收入18.6亿元，同比增长128%；归母净利润2.3亿元，同比增长215%。' },
+  { stock:'中科曙光', title:'关于中标国家智算中心项目的公告', type:'重大事项', date:'2026-05-18', source:'上交所', summary:'公司中标某国家级智算中心建设项目，合同金额约12.5亿元，占2025年营业收入的8.2%。' },
+  { stock:'中科曙光', title:'关于回购公司股份进展的公告', type:'日常经营', date:'2026-05-16', source:'上交所', summary:'截至2026年5月15日，公司累计回购股份520万股，占总股本的0.35%，已支付总金额3.05亿元。' },
+  { stock:'海光信息', title:'关于DCU四代产品通过客户验证的公告', type:'重大事项', date:'2026-05-14', source:'上交所', summary:'公司DCU四代产品已通过多家头部客户验证，预计Q3开始批量供货。' },
+  { stock:'宁德时代', title:'关于调整2026年产能规划的公告', type:'重大事项', date:'2026-05-13', source:'深交所', summary:'公司将2026年电池产能目标上调至450GWh，较原计划提升15%，主要受储能业务强劲需求驱动。' },
+  { stock:'比亚迪', title:'2026年4月产销快报', type:'定期报告', date:'2026-05-10', source:'深交所', summary:'4月新能源汽车销量34.2万辆，同比增长42%；其中海外销量5.8万辆，同比增长186%。' },
+];
+
+const stockNewsData = [
+  { stock:'千里科技', title:'千里科技AI终端新品提前曝光，搭载自研NPU性能超预期', date:'2026-05-20', source:'36氪', summary:'据供应链消息，千里科技即将发布的AI终端新品搭载第二代自研NPU，AI推理性能较上代提升3倍，功耗降低40%。', sentiment:'positive' },
+  { stock:'千里科技', title:'阶跃星辰宣布千里科技为首批端侧合作伙伴', date:'2026-05-18', source:'财联社', summary:'阶跃星辰在Step-3模型发布会上宣布，千里科技将成为首批端侧大模型部署合作伙伴，合作终端产品预计Q3面世。', sentiment:'positive' },
+  { stock:'中科曙光', title:'中科曙光液冷服务器获国家级数据中心大单', date:'2026-05-17', source:'证券时报', summary:'中科曙光旗下液冷服务器产品线获得某国家级数据中心采购订单，金额超10亿元，液冷渗透率加速提升。', sentiment:'positive' },
+  { stock:'海光信息', title:'海光信息DCU芯片生态持续扩展，适配主流AI框架', date:'2026-05-15', source:'机器之心', summary:'海光信息宣布DCU四代已完成PyTorch、PaddlePaddle、MindSpore三大主流AI框架的全面适配。', sentiment:'positive' },
+  { stock:'宁德时代', title:'宁德时代固态电池中试线提前投产，能量密度突破500Wh/kg', date:'2026-05-14', source:'第一财经', summary:'宁德时代位于宁德的固态电池中试线已提前投产，首批样品能量密度达到500Wh/kg，超出行业预期。', sentiment:'positive' },
+  { stock:'比亚迪', title:'比亚迪智能驾驶部门扩招500人，L3量产进入冲刺阶段', date:'2026-05-12', source:'界面新闻', summary:'比亚迪近期大规模招聘智能驾驶工程师，计划在年内实现L3级自动驾驶在高端车型的量产搭载。', sentiment:'neutral' },
+  { stock:'中际旭创', title:'中际旭创800G光模块产能满载，1.6T样品送测头部客户', date:'2026-05-11', source:'C114通信网', summary:'中际旭创800G光模块产线满负荷运转，同时1.6T光模块样品已送测多家北美云厂商，预计2027年量产。', sentiment:'positive' },
+  { stock:'寒武纪', title:'寒武纪获国家大基金三期投资，加速先进制程芯片研发', date:'2026-05-09', source:'财联社', summary:'国家集成电路产业投资基金三期对寒武纪追加投资15亿元，支持其下一代AI训练芯片的先进制程研发。', sentiment:'positive' },
+];
+
 let currentStockTab = 'expert';
 function switchStockTab(el, tab) {
   document.querySelectorAll('#stock-tabs .monitor-tab').forEach(t => t.classList.remove('active'));
@@ -4155,6 +4179,42 @@ function renderStockTabContent() {
             <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">${r.summary}</div>
           </div>
           <span style="font-size:10px; color:var(--text-muted); flex-shrink:0; font-family:var(--font-mono);">${r.date}</span>
+        </div>
+      </div>
+    `).join('');
+  } else if (currentStockTab === 'announcements') {
+    const ann = stockAnnouncementsData.filter(a => a.stock === stock);
+    const allAnn = ann.length > 0 ? ann : stockAnnouncementsData.slice(0, 5);
+    container.innerHTML = allAnn.map(a => `
+      <div class="card" style="padding:14px; margin-bottom:10px; cursor:pointer;" onclick="showToast('打开公告：${a.title.replace(/'/g,"\\'")}')">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+              <span class="tag ${a.type==='重大事项'?'tag-cyan':a.type==='定期报告'?'tag-blue':'tag-gold'}" style="font-size:9px;">${a.type}</span>
+              <span style="font-size:10px; color:var(--text-muted);">${a.source}</span>
+            </div>
+            <div style="font-size:13px; font-weight:600;">${a.title}</div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">${a.summary}</div>
+          </div>
+          <span style="font-size:10px; color:var(--text-muted); flex-shrink:0; font-family:var(--font-mono);">${a.date}</span>
+        </div>
+      </div>
+    `).join('');
+  } else if (currentStockTab === 'news') {
+    const news = stockNewsData.filter(n => n.stock === stock);
+    const allNews = news.length > 0 ? news : stockNewsData.slice(0, 5);
+    container.innerHTML = allNews.map(n => `
+      <div class="card" style="padding:14px; margin-bottom:10px; cursor:pointer;" onclick="showToast('打开资讯：${n.title.replace(/'/g,"\\'")}')">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+              <span class="tag ${n.sentiment==='positive'?'tag-cyan':'tag-gold'}" style="font-size:9px;">${n.sentiment==='positive'?'利好':'中性'}</span>
+              <span style="font-size:10px; color:var(--text-muted);">${n.source}</span>
+            </div>
+            <div style="font-size:13px; font-weight:600;">${n.title}</div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">${n.summary}</div>
+          </div>
+          <span style="font-size:10px; color:var(--text-muted); flex-shrink:0; font-family:var(--font-mono);">${n.date}</span>
         </div>
       </div>
     `).join('');
