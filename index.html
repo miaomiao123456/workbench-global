@@ -3476,7 +3476,7 @@ body {
           <div class="filter-chip" data-filter="reports-industry" data-value="zonghe" onclick="toggleReportsChip(this,'reports-industry')">综合</div>
         </div>
       </div>
-      <div id="reports-list" style="display:flex; flex-direction:column; gap:10px;">
+      <div id="reports-list">
       </div>
     </div>
   </div>
@@ -8564,36 +8564,61 @@ function openMinutesDetail(id) {
 function openReportDetail(id) {
   const item = reportsData.find(r => r.id === id);
   if (!item) return;
-  const toc = ['报告摘要', '核心逻辑', '盈利预测', '风险提示'];
+  const industryLabels = {ai:'AI产业',semiconductor:'半导体',newenergy:'新能源',medical:'医药生物',finance:'金融',consume:'消费'};
+  const toc = ['报告信息', '报告原文'];
   const content = `
-    <h1>${item.title}</h1>
-    <div class="meta">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h1 style="margin:0;">${item.title}</h1>
+    </div>
+    <div class="meta" style="margin-bottom:20px;">
       <span>${item.date}</span>
       <span class="tag">${item.broker}</span>
       ${item.researcher ? '<span>' + item.researcher + '</span>' : ''}
       ${item.rating ? '<span class="tag">' + item.rating + '</span>' : ''}
       ${item.pages ? '<span>' + item.pages + '页</span>' : ''}
+      <span>${industryLabels[item.industry]||item.industry||''}</span>
     </div>
-    <h2 id="sec0">报告摘要</h2>
-    <p>${item.summary}</p>
-    <div class="highlight"><p>评级：${item.rating || '未评级'} ${item.targetPrice ? '| 目标价：' + item.targetPrice : ''}</p></div>
-    <h2 id="sec1">核心逻辑</h2>
-    <ul>
-      <li>行业趋势明确，景气度持续向上，核心指标环比改善</li>
-      <li>公司竞争壁垒深厚，市场份额稳步提升</li>
-      <li>新产品/新业务有望贡献增量收入，打开中期成长空间</li>
-      <li>估值处于合理区间，业绩兑现确定性较高</li>
-    </ul>
-    <h2 id="sec2">盈利预测</h2>
-    <p>基于当前业务节奏和行业景气度，预计公司未来2年收入CAGR在30-40%区间，净利润增速有望超过收入增速，毛利率稳中有升。</p>
-    <p>关键假设包括：下游需求维持高景气、产品ASP保持稳定、新产能顺利爬坡。</p>
-    <h2 id="sec3">风险提示</h2>
-    <ul>
-      <li>下游需求不及预期</li>
-      <li>行业竞争加剧导致毛利率下行</li>
-      <li>新产品研发进度不及预期</li>
-      <li>宏观经济波动影响企业资本开支意愿</li>
-    </ul>
+    <div id="sec0" style="background:var(--bg);border-radius:8px;padding:16px;margin-bottom:24px;">
+      <div style="font-size:13px;line-height:1.8;color:var(--text-sec);">${item.summary}</div>
+      ${item.stocks.length?'<div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">'+item.stocks.map(s=>'<span style="font-size:11px;padding:2px 8px;background:rgba(45,127,249,0.08);color:var(--blue);border-radius:4px;">'+s+'</span>').join('')+'</div>':''}
+    </div>
+    <h2 id="sec1">报告原文</h2>
+    <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:12px;">
+      <div style="background:var(--bg);padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:12px;color:var(--text-sec);">输入关键词</span>
+          <span style="font-size:12px;color:var(--text-muted);">🔍</span>
+          <span style="font-size:12px;color:var(--text-muted);">📄</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:12px;font-weight:600;">1 / ${item.pages||'--'}</span>
+          <span style="font-size:12px;color:var(--text-muted);">— +</span>
+          <span style="font-size:12px;color:var(--text-muted);">自动缩放</span>
+        </div>
+      </div>
+      <div style="padding:32px;min-height:600px;background:#fff;">
+        <div style="max-width:680px;margin:0 auto;">
+          <div style="font-size:13px;line-height:2;color:var(--text-sec);margin-bottom:20px;">
+            <p style="margin-bottom:12px;"><strong>▶ ${item.summary}</strong></p>
+            <p style="margin-bottom:12px;">▶ 重点推荐标的：<strong style="color:var(--blue);">${item.stocks.length?item.stocks.join('、'):'--'}</strong></p>
+            <p style="margin-bottom:12px;">▶ 风险提示：研发进展不及预期；商业化推进不及预期；海外审批或收益不达预期；集采风险；药品和耗材降价超预期风险；药品进一步的集采风险；国际地缘政治风险。</p>
+          </div>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:24px;">数据来源：${item.broker}</div>
+          <div style="text-align:center;margin-bottom:24px;">
+            <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:16px;">目录</div>
+          </div>
+          <div style="font-size:14px;line-height:2.2;color:var(--text);">
+            <p>■ 1、行业趋势与核心逻辑</p>
+            <p>■ 2、竞争格局与市场份额分析</p>
+            <p>■ 3、业绩拆解与盈利预测</p>
+            <p>■ 4、估值分析与投资建议</p>
+            <p>■ 5、产业链上下游梳理</p>
+            <p>■ 6、重点推荐标的</p>
+            <p>■ 7、风险提示</p>
+          </div>
+        </div>
+      </div>
+    </div>
   `;
   openDetailPage({ title: item.title, toc, content });
 }
@@ -9560,18 +9585,37 @@ const reportsData = [
 function renderReports(data) {
   const list = document.getElementById('reports-list');
   if (!list) return;
-  list.innerHTML = data.map(r => `
-    <div class="card" style="padding:14px; cursor:pointer;" onclick="openReportDetail(${r.id})">
-      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-        <span style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">${r.date}</span>
-        ${r.rating?`<span class="tag ${r.rating==='买入'?'tag-cyan':r.rating==='推荐'?'tag-blue':'tag-gold'}" style="font-size:9px; padding:1px 5px;">${r.rating}</span>`:''}
-        ${r.stocks.length?r.stocks.map(s=>`<span class="tag tag-gold" style="font-size:9px; padding:1px 5px;">${s}</span>`).join(''):''}
-        <span style="font-size:11px; font-weight:600; color:var(--accent-blue);">${r.broker}</span>
-      </div>
-      <div style="font-size:13px; font-weight:600; margin-bottom:6px;">${r.title}</div>
-      <div style="font-size:11px; color:var(--text-secondary); line-height:1.5; margin-bottom:8px;">${r.summary}</div>
-    </div>
-  `).join('');
+  const industryLabels = {ai:'AI产业',semiconductor:'半导体',newenergy:'新能源',medical:'医药生物',finance:'金融',consume:'消费'};
+  list.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);color:var(--text-muted);font-size:11px;">
+          <th style="text-align:left;padding:10px 8px;font-weight:500;">标题</th>
+          <th style="text-align:left;padding:10px 8px;font-weight:500;width:80px;">个股</th>
+          <th style="text-align:left;padding:10px 8px;font-weight:500;width:80px;">行业</th>
+          <th style="text-align:left;padding:10px 8px;font-weight:500;width:80px;">类型</th>
+          <th style="text-align:left;padding:10px 8px;font-weight:500;width:90px;">机构</th>
+          <th style="text-align:left;padding:10px 8px;font-weight:500;width:100px;">作者</th>
+          <th style="text-align:left;padding:10px 8px;font-weight:500;width:80px;">报告时间</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(r => `
+          <tr style="border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;" onclick="openReportDetail(${r.id})" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+            <td style="padding:12px 8px;">
+              <span style="font-weight:600;color:var(--text-primary);">${r.title}</span>
+              ${r.rating?` <span style="font-size:9px;padding:1px 5px;border-radius:3px;background:${r.rating==='买入'?'rgba(0,184,148,0.12)':r.rating==='推荐'?'rgba(45,127,249,0.12)':'rgba(224,159,19,0.12)'};color:${r.rating==='买入'?'#00b894':r.rating==='推荐'?'#2d7ff9':'#e09f13'};font-weight:600;">${r.rating}</span>`:''}
+            </td>
+            <td style="padding:12px 8px;color:var(--accent-blue);">${r.stocks.length?r.stocks.join('、'):'–'}</td>
+            <td style="padding:12px 8px;color:var(--text-secondary);">${industryLabels[r.industry]||r.industry||'–'}</td>
+            <td style="padding:12px 8px;color:var(--text-secondary);">${r.reportType||'–'}</td>
+            <td style="padding:12px 8px;color:var(--text-secondary);">${r.broker}</td>
+            <td style="padding:12px 8px;color:var(--text-secondary);">${r.researcher||'–'}</td>
+            <td style="padding:12px 8px;color:var(--text-muted);font-family:var(--font-mono);">${r.date.slice(5)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>`;
 }
 
 let reportsFilterState = { source:'all', industry:'all' };
