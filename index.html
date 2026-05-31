@@ -8520,38 +8520,102 @@ ${opts.extraScript || ''}
   w.document.close();
 }
 
+function buildMinutesContentHTML(opts) {
+  const indLabel = opts.industryLabel || '';
+  const expert = opts.expert || '';
+  const org = opts.org || '';
+  const title = opts.title || '';
+  const summary = opts.summary || '';
+  const stock = opts.stock || '';
+  const status = opts.status || '回放';
+
+  return `
+    <h1 style="font-size:18px;font-weight:700;margin-bottom:8px;">${title}</h1>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      ${indLabel?'<span style="font-size:10px;padding:2px 8px;border:1px solid var(--blue);color:var(--blue);border-radius:4px;">'+indLabel+'</span>':''}
+      <span style="font-size:12px;color:#e8740a;font-weight:600;">▶ ${status}</span>
+      ${expert?'<span style="font-size:12px;color:var(--text-sec);">主讲：'+expert+(org?' · '+org:'')+'</span>':''}
+    </div>
+    <div style="position:relative;background:#1a1f2e;border-radius:12px;overflow:hidden;margin-bottom:24px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <span style="font-size:28px;color:#e8740a;margin-left:4px;">▶</span>
+      </div>
+      <div style="position:absolute;bottom:12px;right:16px;background:rgba(0,0,0,0.7);color:#fff;font-size:12px;padding:2px 8px;border-radius:4px;">31:00</div>
+    </div>
+    <div style="display:flex;gap:0;margin-bottom:4px;border-bottom:2px solid var(--border);">
+      <div class="mtab-btn active" onclick="switchMinTab(this,'mtab-detail')" style="padding:10px 20px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid var(--blue);color:var(--blue);margin-bottom:-2px;">会议详情</div>
+      <div class="mtab-btn" onclick="switchMinTab(this,'mtab-expert')" style="padding:10px 20px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted);margin-bottom:-2px;">专家介绍</div>
+      <div class="mtab-btn" onclick="switchMinTab(this,'mtab-minutes')" style="padding:10px 20px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted);margin-bottom:-2px;">会议纪要</div>
+    </div>
+    <div id="mtab-detail" style="padding-top:16px;">
+      <p style="font-size:13px;line-height:1.8;color:var(--text-sec);">${summary}</p>
+      ${stock?'<div style="margin-top:12px;"><span style="font-size:11px;padding:2px 8px;background:rgba(45,127,249,0.08);color:var(--blue);border-radius:4px;">'+stock+'</span></div>':''}
+    </div>
+    <div id="mtab-expert" style="display:none;padding-top:16px;">
+      ${expert?'<div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border-radius:8px;"><div style="width:48px;height:48px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--blue);font-weight:700;">'+expert.charAt(0)+'</div><div><div style="font-size:14px;font-weight:600;">'+expert+'</div><div style="font-size:12px;color:var(--text-muted);margin-top:4px;">'+(org||'')+'</div></div></div>':'<p style="font-size:12px;color:var(--text-muted);">暂无专家信息</p>'}
+    </div>
+    <div id="mtab-minutes" style="display:none;padding-top:16px;">
+      <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border);">
+        <div class="sub-tab active" onclick="switchSubTab(this,'sub-summary')" style="padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--text);color:var(--text);margin-bottom:-1px;">纪要总结</div>
+        <div class="sub-tab" onclick="switchSubTab(this,'sub-detail')" style="padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted);margin-bottom:-1px;">纪要明细</div>
+      </div>
+      <div id="sub-summary">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:14px;font-weight:700;color:var(--blue);margin-bottom:10px;">◆ 核心观点</div>
+          <ul style="margin:0 0 0 18px;font-size:13px;line-height:2;color:var(--text-sec);">
+            <li>深度解析${indLabel||'行业'}领域核心趋势，研判产业链关键拐点与投资节奏</li>
+            <li>梳理产业链上下游核心标的，明确受益确定性最高的环节</li>
+            <li>结合最新政策与市场数据，给出中短期配置建议</li>
+          </ul>
+        </div>
+        <div style="margin-bottom:20px;">
+          <div style="font-size:14px;font-weight:700;color:var(--blue);margin-bottom:10px;">◆ 数据要点</div>
+          <ul style="margin:0 0 0 18px;font-size:13px;line-height:2;color:var(--text-sec);">
+            <li>行业景气度指标持续上行，核心公司订单能见度较高</li>
+            <li>产能利用率维持高位，供需格局持续改善</li>
+            <li>估值处于历史中位数偏下水平，性价比突出</li>
+          </ul>
+        </div>
+      </div>
+      <div id="sub-detail" style="display:none;">
+        <div style="font-size:13px;line-height:2;color:var(--text-sec);">
+          <p style="margin-bottom:12px;">${summary}</p>
+          <p style="margin-bottom:12px;">与会专家从技术可行性、市场空间、竞争壁垒三个维度给出了系统性分析。在技术层面，最新进展表明关键瓶颈正在被突破，预计未来6-12个月将看到明显的产品化成果。</p>
+          <p style="margin-bottom:12px;">在商业层面，头部客户已进入批量采购阶段，收入确认节奏加快。风险方面需关注政策不确定性、上游供应链约束以及海外竞品的追赶速度。</p>
+          <p>整体判断：当前处于产业加速期，建议积极布局核心环节。</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function openMinutesDetail(id) {
   const item = minutesData.find(m => m.id === id);
   if (!item) return;
   const industryLabels = {ai:'AI',semiconductor:'半导体',newenergy:'新能源',medical:'医疗',finance:'金融',consume:'消费'};
-  const toc = ['概述', '核心观点', '详细内容', '相关标的'];
-  const content = `
-    <h1>${item.title}</h1>
-    <div class="meta">
-      <span>${item.date}</span>
-      ${item.expert ? '<span class="tag">' + item.expert + '</span>' : ''}
-      <span class="tag">${industryLabels[item.industry] || item.industry}</span>
-      ${item.stock ? '<span class="tag">' + item.stock + '</span>' : ''}
-    </div>
-    <h2 id="sec0">概述</h2>
-    <p>${item.summary}</p>
-    <h2 id="sec1">核心观点</h2>
-    <div class="highlight"><p>以下为AI基于纪要原文提炼的核心结论，供投资决策参考。</p></div>
-    <ul>
-      <li>技术路线验证进展超预期，产业化时间表明确</li>
-      <li>竞争格局分析：头部厂商优势持续扩大，二线参与者面临整合压力</li>
-      <li>商业模式已跑通，单位经济模型转正拐点临近</li>
-    </ul>
-    <h2 id="sec2">详细内容</h2>
-    <p>本次会议围绕当前行业核心议题展开深入讨论。与会专家从技术可行性、市场空间、竞争壁垒三个维度给出了系统性分析。</p>
-    <p>在技术层面，最新进展表明关键瓶颈正在被突破，预计未来6-12个月将看到明显的产品化成果。在商业层面，头部客户已进入批量采购阶段，收入确认节奏加快。</p>
-    <p>风险方面需关注政策不确定性、上游供应链约束以及海外竞品的追赶速度。整体判断：当前处于产业加速期，建议积极布局核心环节。</p>
-    <h2 id="sec3">相关标的</h2>
-    <ul>
-      ${item.stock ? '<li><strong>' + item.stock + '</strong> — 核心受益标的，建议关注</li>' : '<li>暂无明确关联个股</li>'}
-    </ul>
-  `;
-  openDetailPage({ title: item.title, toc, content });
+  const orgLabels = {zhongxin:'中信证券',huatai:'华泰证券',guotai:'国泰君安',internal:'内部调研'};
+  const toc = ['会议详情', '专家介绍', '会议纪要'];
+  const content = buildMinutesContentHTML({
+    title: item.title,
+    industryLabel: industryLabels[item.industry] || item.industry,
+    expert: item.expert || '',
+    org: orgLabels[item.org] || item.org || '',
+    summary: item.summary,
+    stock: item.stock || '',
+    status: '回放'
+  });
+  openDetailPage({ title: item.title, toc, content, extraScript: `
+    function switchMinTab(el, tabId) {
+      el.parentElement.querySelectorAll('.mtab-btn').forEach(function(t){t.style.color='var(--text-muted)';t.style.fontWeight='500';t.style.borderBottom='2px solid transparent';});
+      el.style.color='var(--blue)';el.style.fontWeight='600';el.style.borderBottom='2px solid var(--blue)';
+      ['mtab-detail','mtab-expert','mtab-minutes'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display=id===tabId?'':'none';});
+    }
+    function switchSubTab(el, tabId) {
+      el.parentElement.querySelectorAll('.sub-tab').forEach(function(t){t.style.color='var(--text-muted)';t.style.fontWeight='500';t.style.borderBottom='2px solid transparent';});
+      el.style.color='var(--text)';el.style.fontWeight='600';el.style.borderBottom='2px solid var(--text)';
+      ['sub-summary','sub-detail'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display=id===tabId?'':'none';});
+    }
+  ` });
 }
 
 function openReportDetail(id) {
@@ -8660,23 +8724,42 @@ function openResearchDetail(id) {
     </div>` : ''}
   `;
 
+  const industryLabels2 = {ai:'AI产业',semiconductor:'半导体',newenergy:'新能源',medical:'医药生物',finance:'金融',consume:'消费'};
   const minutesContent = `
-    <div style="font-size:13px;line-height:2;color:var(--text-sec);">
-      <p style="margin-bottom:12px;">本次${item.typeLabel}围绕「${item.title}」主题展开，重点讨论了以下几个方面：</p>
-      <p style="margin-bottom:8px;"><strong>一、行业现状与趋势</strong></p>
-      <p style="margin-bottom:12px;">${item.summary}</p>
-      <p style="margin-bottom:8px;"><strong>二、核心发现</strong></p>
-      <ul style="margin:8px 0 16px 18px;">
-        <li>产业趋势验证：实地调研确认行业景气度与案头研究结论一致，核心环节供需偏紧。</li>
-        <li>竞争格局方面：龙头厂商技术壁垒持续加深，二线厂商差异化突围路径逐步明确。</li>
-        <li>商业化进展：头部客户订单落地节奏符合预期，收入确认有望加速。</li>
-      </ul>
-      <p style="margin-bottom:8px;"><strong>三、风险提示</strong></p>
-      <p style="margin-bottom:12px;">需关注上游原材料价格波动、行业产能扩张节奏以及海外政策不确定性。整体判断：当前处于产业加速期，建议沿核心环节积极配置。</p>
-      <p style="margin-bottom:8px;"><strong>四、相关标的</strong></p>
-      <ul style="margin:8px 0 16px 18px;">
-        ${item.stocks.length ? item.stocks.map(s => '<li><strong>' + s + '</strong> — 核心受益标的，建议关注</li>').join('') : '<li>暂无明确关联个股</li>'}
-      </ul>
+    <div style="position:relative;background:#1a1f2e;border-radius:12px;overflow:hidden;margin-bottom:24px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <span style="font-size:28px;color:#e8740a;margin-left:4px;">▶</span>
+      </div>
+      <div style="position:absolute;bottom:12px;right:16px;background:rgba(0,0,0,0.7);color:#fff;font-size:12px;padding:2px 8px;border-radius:4px;">45:00</div>
+    </div>
+    <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--border);">
+      <div class="sub-tab active" onclick="switchSubTab(this,'sub-summary')" style="padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--text);color:var(--text);margin-bottom:-1px;">纪要总结</div>
+      <div class="sub-tab" onclick="switchSubTab(this,'sub-detail')" style="padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-muted);margin-bottom:-1px;">纪要明细</div>
+    </div>
+    <div id="sub-summary">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:700;color:var(--blue);margin-bottom:10px;">◆ 核心观点</div>
+        <ul style="margin:0 0 0 18px;font-size:13px;line-height:2;color:var(--text-sec);">
+          <li>深度解析${industryLabels2[item.industry]||'行业'}领域核心趋势，研判产业链关键拐点与投资节奏</li>
+          <li>梳理产业链上下游核心标的，明确受益确定性最高的环节</li>
+          <li>结合最新政策与市场数据，给出中短期配置建议</li>
+        </ul>
+      </div>
+      <div style="margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:700;color:var(--blue);margin-bottom:10px;">◆ 数据要点</div>
+        <ul style="margin:0 0 0 18px;font-size:13px;line-height:2;color:var(--text-sec);">
+          <li>行业景气度指标持续上行，核心公司订单能见度较高</li>
+          <li>产能利用率维持高位，供需格局持续改善</li>
+          <li>估值处于历史中位数偏下水平，性价比突出</li>
+        </ul>
+      </div>
+    </div>
+    <div id="sub-detail" style="display:none;">
+      <div style="font-size:13px;line-height:2;color:var(--text-sec);">
+        <p style="margin-bottom:12px;">${item.summary}</p>
+        <p style="margin-bottom:12px;">与会专家从技术可行性、市场空间、竞争壁垒三个维度给出了系统性分析。在技术层面，最新进展表明关键瓶颈正在被突破，预计未来6-12个月将看到明显的产品化成果。</p>
+        <p>在商业层面，头部客户已进入批量采购阶段，收入确认节奏加快。风险方面需关注政策不确定性、上游供应链约束以及海外竞品的追赶速度。</p>
+      </div>
     </div>
   `;
 
@@ -8711,6 +8794,11 @@ function openResearchDetail(id) {
       btn.style.background = '#9aa3b4';
       btn.style.cursor = 'default';
       btn.onclick = null;
+    }
+    function switchSubTab(el, tabId) {
+      el.parentElement.querySelectorAll('.sub-tab').forEach(function(t){t.style.color='var(--text-muted)';t.style.fontWeight='500';t.style.borderBottom='2px solid transparent';});
+      el.style.color='var(--text)';el.style.fontWeight='600';el.style.borderBottom='2px solid var(--text)';
+      ['sub-summary','sub-detail'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display=id===tabId?'':'none';});
     }
   ` });
 }
