@@ -8558,25 +8558,59 @@ function openReportDetail(id) {
   const item = reportsData.find(r => r.id === id);
   if (!item) return;
   const industryLabels = {ai:'AI产业',semiconductor:'半导体',newenergy:'新能源',medical:'医药生物',finance:'金融',consume:'消费'};
-  const toc = ['报告摘要', '报告原文'];
+  const indLabel = industryLabels[item.industry]||item.industry||'';
+  const stockName = item.stocks.length ? item.stocks[0] : '';
+  const toc = ['报告原文'];
   const content = `
-    <div class="meta" style="margin-bottom:16px;">
-      <span>${item.date}</span>
-      <span class="tag">${item.broker}</span>
-      ${item.researcher ? '<span>' + item.researcher + '</span>' : ''}
-      ${item.rating ? '<span class="tag">' + item.rating + '</span>' : ''}
-      ${item.pages ? '<span>' + item.pages + '页</span>' : ''}
-      <span>${industryLabels[item.industry]||item.industry||''}</span>
-    </div>
-    <div id="sec0" style="font-size:13px;line-height:1.8;color:var(--text-sec);margin-bottom:16px;">${item.summary}</div>
-    ${item.stocks.length?'<div style="margin-bottom:24px;display:flex;gap:6px;flex-wrap:wrap;">'+item.stocks.map(s=>'<span style="font-size:11px;padding:2px 8px;background:rgba(45,127,249,0.08);color:var(--blue);border-radius:4px;">'+s+'</span>').join('')+'</div>':''}
-    <hr style="border:none;border-top:1px solid var(--border);margin:24px 0;">
-    <h2 id="sec1" style="border-top:none;padding-top:0;margin-top:0;">报告原文</h2>
-    <div style="font-size:13px;line-height:2;color:var(--text-sec);margin-top:16px;">
-      <p style="margin-bottom:16px;">${item.summary}</p>
-      <p style="margin-bottom:16px;">重点推荐标的：<strong>${item.stocks.length?item.stocks.join('、'):'--'}</strong></p>
-      <p style="margin-bottom:16px;">风险提示：研发进展不及预期；商业化推进不及预期；海外审批或收益不达预期；集采风险；药品和耗材降价超预期风险；国际地缘政治风险。</p>
-      <p style="margin-bottom:8px;font-size:10px;color:var(--text-muted);">数据来源：${item.broker}</p>
+    <div id="sec0" style="background:#fff;border:1px solid #e0e0e0;border-radius:4px;padding:40px 48px;min-height:700px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+      <!-- 券商 header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div style="font-size:22px;font-weight:700;color:#c00;">${item.broker}</div>
+        <div style="font-size:11px;color:#888;text-align:right;">${indLabel}</div>
+      </div>
+      <div style="border-bottom:2px solid #c00;margin-bottom:20px;"></div>
+
+      <!-- 标题区 -->
+      <div style="display:flex;gap:32px;margin-bottom:24px;">
+        <div style="flex-shrink:0;width:200px;">
+          ${stockName?'<div style="font-size:15px;font-weight:700;color:#333;margin-bottom:4px;">'+stockName+'</div>':''}
+          <div style="font-size:11px;color:#888;">${item.date}</div>
+          <div style="margin-top:12px;font-size:12px;color:#333;">投资评级：<strong style="color:#c00;">${item.rating||'--'}</strong></div>
+          <table style="margin-top:16px;font-size:11px;color:#555;border-collapse:collapse;width:100%;">
+            <tr><td style="padding:3px 0;color:#888;">报告类型</td><td style="padding:3px 0;text-align:right;">${item.reportType||'--'}</td></tr>
+            <tr><td style="padding:3px 0;color:#888;">报告页数</td><td style="padding:3px 0;text-align:right;">${item.pages||'--'}页</td></tr>
+            ${item.targetPrice?'<tr><td style="padding:3px 0;color:#888;">目标价</td><td style="padding:3px 0;text-align:right;">'+item.targetPrice+'</td></tr>':''}
+          </table>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:18px;font-weight:700;color:#222;line-height:1.5;margin-bottom:12px;">${item.title}</div>
+          <div style="font-size:11px;color:#888;margin-bottom:16px;">——${item.reportType||'深度报告'}</div>
+          <div style="display:flex;gap:24px;margin-bottom:16px;">
+            ${item.researcher?item.researcher.split(' ').map(name=>'<div style="text-align:center;"><div style="font-size:12px;font-weight:600;color:#333;">'+name+'</div><div style="font-size:10px;color:#888;">分析师</div></div>').join(''):''}
+          </div>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid #e0e0e0;padding-top:20px;">
+        <!-- 核心观点 -->
+        <div style="font-size:13px;line-height:2;color:#333;">
+          <p style="margin-bottom:12px;"><span style="color:#c00;font-weight:700;">●</span> <strong>${item.summary}</strong></p>
+          <p style="margin-bottom:12px;font-size:12px;color:#555;">
+            ${item.stocks.length?'重点推荐标的：<strong style="color:#c00;">'+item.stocks.join('、')+'</strong>。':''}
+            基于当前业务节奏和行业景气度，预计公司未来2年收入CAGR在30-40%区间，净利润增速有望超过收入增速，毛利率稳中有升。
+          </p>
+          <p style="margin-bottom:12px;font-size:12px;color:#555;">
+            <span style="color:#c00;font-weight:700;">●</span> 行业趋势明确，核心指标环比改善。竞争壁垒深厚，市场份额稳步提升。新产品/新业务有望贡献增量收入，打开中期成长空间。
+          </p>
+          <p style="margin-bottom:12px;font-size:12px;color:#555;">
+            <span style="color:#c00;font-weight:700;">●</span> 风险提示：下游需求不及预期；行业竞争加剧导致毛利率下行；新产品研发进度不及预期；宏观经济波动影响企业资本开支意愿。
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;padding-top:12px;border-top:1px solid #e0e0e0;font-size:10px;color:#aaa;">
+        数据来源：${item.broker}研究所
+      </div>
     </div>
   `;
   openDetailPage({ title: item.title, toc, content });
