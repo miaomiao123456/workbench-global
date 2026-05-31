@@ -9492,7 +9492,15 @@ const researchData = [
 function renderResearch(data) {
   const list = document.getElementById('research-list');
   if (!list) return;
-  list.innerHTML = data.map(r => {
+  const now = new Date('2026-05-20');
+  const sorted = [...data].sort((a, b) => {
+    const aEnded = new Date(a.date) < now;
+    const bEnded = new Date(b.date) < now;
+    if (aEnded !== bEnded) return aEnded ? 1 : -1;
+    if (!aEnded) return new Date(a.date) - new Date(b.date);
+    return new Date(b.date) - new Date(a.date);
+  });
+  list.innerHTML = sorted.map(r => {
     const isEnded = new Date(r.date) < new Date('2026-05-20');
     return `
     <div class="card" style="padding:14px; border-left:4px solid ${r.color}; cursor:pointer;" onclick="openResearchDetail(${r.id})">
